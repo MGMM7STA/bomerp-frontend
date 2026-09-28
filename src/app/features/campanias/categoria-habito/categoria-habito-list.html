@@ -1,0 +1,39 @@
+<h2>Categorias de habito</h2>
+
+@if (loading()) {
+  <p>Cargando categorias de habito...</p>
+}
+
+<app-mensaje-error [texto]="error()" />
+
+<a routerLink="/campanias/categorias-habito/nueva">Nueva categoria de habito</a>
+
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Nombre</th>
+      <th>Descripcion</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    @for (categoria of categorias(); track categoria.id) {
+      <tr>
+        <td>{{ categoria.id }}</td>
+        <td>{{ categoria.nombre }}</td>
+        <td>{{ categoria.descripcion }}</td>
+        <td>
+          <a [routerLink]="['/campanias/categorias-habito', categoria.id, 'editar']">Editar</a>
+          <button (click)="eliminar(categoria.id!, categoria.nombre)">Eliminar</button>
+        </td>
+      </tr>
+    } @empty {
+      @if (!loading() && !error()) {
+        <tr>
+          <td colspan="4">No hay categorias de habito registradas.</td>
+        </tr>
+      }
+    }
+  </tbody>
+</table>

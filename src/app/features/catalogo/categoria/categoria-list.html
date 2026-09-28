@@ -2,9 +2,7 @@
   <p>Cargando categorías...</p>
 }
 
-@if (error()) {
-  <p class="error">{{ error() }}</p>
-}
+<app-mensaje-error [texto]="error()" />
 
 <a routerLink="/catalogo/categorias/nueva">Nueva categoría</a>
 

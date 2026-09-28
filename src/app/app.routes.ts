@@ -24,6 +24,27 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/catalogo/categoria/categoria-form').then((m) => m.CategoriaForm),
       },
+      {
+        path: 'campanias/categorias-habito',
+        loadComponent: () =>
+          import('./features/campanias/categoria-habito/categoria-habito-list').then(
+            (m) => m.CategoriaHabitoList,
+          ),
+      },
+      {
+        path: 'campanias/categorias-habito/nueva',
+        loadComponent: () =>
+          import('./features/campanias/categoria-habito/categoria-habito-form').then(
+            (m) => m.CategoriaHabitoForm,
+          ),
+      },
+      {
+        path: 'campanias/categorias-habito/:id/editar',
+        loadComponent: () =>
+          import('./features/campanias/categoria-habito/categoria-habito-form').then(
+            (m) => m.CategoriaHabitoForm,
+          ),
+      },
     ],
   },
 ];

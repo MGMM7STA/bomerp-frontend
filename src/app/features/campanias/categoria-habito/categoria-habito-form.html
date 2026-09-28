@@ -1,0 +1,24 @@
+<h2>{{ id() ? 'Editar categoria de habito' : 'Nueva categoria de habito' }}</h2>
+
+<form [formGroup]="form" (ngSubmit)="guardar()">
+  @if (loading()) {
+    <p>Cargando...</p>
+  }
+
+  <label>
+    Nombre
+    <input type="text" formControlName="nombre" />
+  </label>
+  <app-mensaje-error [texto]="mensajeValidacion('nombre')" />
+
+  <label>
+    Descripcion
+    <textarea formControlName="descripcion"></textarea>
+  </label>
+  <app-mensaje-error [texto]="mensajeValidacion('descripcion')" />
+
+  <app-mensaje-error [texto]="error()" />
+
+  <button type="submit" [disabled]="loading() || errorCarga()">Guardar</button>
+  <button type="button" (click)="cancelar()">Cancelar</button>
+</form>
