@@ -6,17 +6,17 @@
   <p class="error">{{ error() }}</p>
 }
 
-<a routerLink="/catalogo/productos/nuevo">Nuevo producto</a>
+<a matButton="filled" routerLink="/catalogo/productos/nuevo">Nuevo producto</a>
 
-<label>
-  Filtrar por categoría
-  <select #filtro (change)="filtrar(+filtro.value)">
-    <option value="0">Todas</option>
+<mat-form-field>
+  <mat-label>Filtrar por categoría</mat-label>
+  <mat-select [value]="0" (selectionChange)="filtrar($event.value)">
+    <mat-option [value]="0">Todas</mat-option>
     @for (categoria of categorias(); track categoria.id) {
-      <option [value]="categoria.id">{{ categoria.nombre }}</option>
+      <mat-option [value]="categoria.id">{{ categoria.nombre }}</mat-option>
     }
-  </select>
-</label>
+  </mat-select>
+</mat-form-field>
 
 <table>
   <thead>
@@ -36,8 +36,8 @@
         <td>{{ producto.precio | currency: 'PEN' : 'S/ ' }}</td>
         <td>{{ producto.stock }}</td>
         <td>
-          <a [routerLink]="['/catalogo/productos', producto.id, 'editar']">Editar</a>
-          <button (click)="eliminar(producto.id)">Eliminar</button>
+          <a matButton [routerLink]="['/catalogo/productos', producto.id, 'editar']">Editar</a>
+          <button matButton class="eliminar" (click)="eliminar(producto.id)">Eliminar</button>
         </td>
       </tr>
     } @empty {

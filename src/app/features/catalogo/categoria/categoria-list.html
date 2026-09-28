@@ -4,7 +4,7 @@
 
 <app-mensaje-error [texto]="error()" />
 
-<a routerLink="/catalogo/categorias/nueva">Nueva categoría</a>
+<a matButton="filled" routerLink="/catalogo/categorias/nueva">Nueva categoría</a>
 
 <table>
   <thead>
@@ -20,8 +20,8 @@
         <td>{{ categoria.nombre }}</td>
         <td>{{ categoria.descripcion }}</td>
         <td>
-          <a [routerLink]="['/catalogo/categorias', categoria.id, 'editar']">Editar</a>
-          <button (click)="eliminar(categoria.id!)">Eliminar</button>
+          <a matButton [routerLink]="['/catalogo/categorias', categoria.id, 'editar']">Editar</a>
+          <button matButton class="eliminar" (click)="eliminar(categoria.id!)">Eliminar</button>
         </td>
       </tr>
     } @empty {

@@ -1,3 +1,7 @@
-.error {
-  color: #b42318;
+form mat-form-field {
+  display: block;
+  max-width: 320px;
+}
+button.eliminar {
+  color: var(--mat-sys-error);
 }

@@ -3,18 +3,18 @@
     <p>Cargando...</p>
   }
 
-  <label>
-    Nombre
-    <input type="text" formControlName="nombre" />
-  </label>
+  <mat-form-field>
+    <mat-label>Nombre</mat-label>
+    <input matInput type="text" formControlName="nombre" />
+  </mat-form-field>
   @if (mensajeValidacion('nombre'); as mensaje) {
     <p class="error">{{ mensaje }}</p>
   }
 
-  <label>
-    Descripción
-    <textarea formControlName="descripcion"></textarea>
-  </label>
+  <mat-form-field>
+    <mat-label>Descripción</mat-label>
+    <textarea matInput formControlName="descripcion"></textarea>
+  </mat-form-field>
   @if (mensajeValidacion('descripcion'); as mensaje) {
     <p class="error">{{ mensaje }}</p>
   }
@@ -23,6 +23,8 @@
     <p class="error">{{ error() }}</p>
   }
 
-  <button type="submit" [disabled]="loading() || errorCarga()">Guardar</button>
-  <button type="button" (click)="cancelar()">Cancelar</button>
+  <button matButton="filled" type="submit" [disabled]="loading() || errorCarga()">
+    Guardar
+  </button>
+  <button matButton type="button" (click)="cancelar()">Cancelar</button>
 </form>

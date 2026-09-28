@@ -6,10 +6,13 @@ import { CategoriaService } from '../categoria/categoria-service';
 import { Categoria } from '../categoria/categoria.model';
 import { ProductoService } from './producto-service';
 import { Producto } from './producto.model';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
 
 @Component({
   selector: 'app-producto-list',
-  imports: [RouterLink, CurrencyPipe],
+    imports: [RouterLink, CurrencyPipe, MatButtonModule, MatFormFieldModule, MatSelectModule],
   templateUrl: './producto-list.html',
 })
 export class ProductoList implements OnInit {
