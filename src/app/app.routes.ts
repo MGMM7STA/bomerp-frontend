@@ -25,6 +25,21 @@ export const routes: Routes = [
           import('./features/catalogo/categoria/categoria-form').then((m) => m.CategoriaForm),
       },
       {
+        path: 'catalogo/productos',
+        loadComponent: () =>
+          import('./features/catalogo/producto/producto-list').then((m) => m.ProductoList),
+      },
+      {
+        path: 'catalogo/productos/nuevo',
+        loadComponent: () =>
+          import('./features/catalogo/producto/producto-form').then((m) => m.ProductoForm),
+      },
+      {
+        path: 'catalogo/productos/:id/editar',
+        loadComponent: () =>
+          import('./features/catalogo/producto/producto-form').then((m) => m.ProductoForm),
+      },
+      {
         path: 'campanias/categorias-habito',
         loadComponent: () =>
           import('./features/campanias/categoria-habito/categoria-habito-list').then(

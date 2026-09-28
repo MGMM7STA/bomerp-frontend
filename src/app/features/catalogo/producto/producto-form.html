@@ -1,0 +1,58 @@
+<form [formGroup]="form" (ngSubmit)="guardar()">
+  @if (loading()) {
+    <p>Cargando...</p>
+  }
+
+  @if (categoriasCargadas() && categorias().length === 0) {
+    <p class="error">
+      No hay categorías registradas. Un producto necesita una categoría:
+      <a routerLink="/catalogo/categorias/nueva">crea una primero</a>.
+    </p>
+  }
+
+  <label>
+    Nombre
+    <input type="text" formControlName="nombre" />
+  </label>
+  @if (mensajeValidacion('nombre'); as mensaje) {
+    <p class="error">{{ mensaje }}</p>
+  }
+
+  <label>
+    Precio (S/)
+    <input type="number" step="0.01" min="0" formControlName="precio" />
+  </label>
+  @if (mensajeValidacion('precio'); as mensaje) {
+    <p class="error">{{ mensaje }}</p>
+  }
+
+  <label>
+    Stock
+    <input type="number" step="1" min="0" formControlName="stock" />
+  </label>
+  @if (mensajeValidacion('stock'); as mensaje) {
+    <p class="error">{{ mensaje }}</p>
+  }
+
+  <label>
+    Categoría
+    <select formControlName="categoriaId">
+      <option [ngValue]="0" disabled>Selecciona una categoría</option>
+      @for (categoria of categorias(); track categoria.id) {
+        <option [ngValue]="categoria.id">{{ categoria.nombre }}</option>
+      }
+    </select>
+  </label>
+  @if (mensajeValidacion('categoriaId'); as mensaje) {
+    <p class="error">{{ mensaje }}</p>
+  }
+
+  @if (error()) {
+    <p class="error">{{ error() }}</p>
+  }
+
+  <button type="submit" [disabled]="loading() || errorCarga() || categorias().length === 0">
+    Guardar
+  </button>
+  <button type="button" (click)="cancelar()">Cancelar</button>
+</form>

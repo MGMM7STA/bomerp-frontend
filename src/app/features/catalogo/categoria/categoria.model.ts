@@ -3,3 +3,8 @@ export interface Categoria {
   nombre: string;
   descripcion?: string;
 }
+
+export interface CategoriaResumen {
+  id: number;
+  nombre: string;
+}

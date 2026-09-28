@@ -1,0 +1,51 @@
+@if (loading()) {
+  <p>Cargando productos...</p>
+}
+
+@if (error()) {
+  <p class="error">{{ error() }}</p>
+}
+
+<a routerLink="/catalogo/productos/nuevo">Nuevo producto</a>
+
+<label>
+  Filtrar por categoría
+  <select #filtro (change)="filtrar(+filtro.value)">
+    <option value="0">Todas</option>
+    @for (categoria of categorias(); track categoria.id) {
+      <option [value]="categoria.id">{{ categoria.nombre }}</option>
+    }
+  </select>
+</label>
+
+<table>
+  <thead>
+    <tr>
+      <th>Nombre</th>
+      <th>Categoría</th>
+      <th>Precio</th>
+      <th>Stock</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    @for (producto of productos(); track producto.id) {
+      <tr>
+        <td>{{ producto.nombre }}</td>
+        <td>{{ producto.categoria.nombre }}</td>
+        <td>{{ producto.precio | currency: 'PEN' : 'S/ ' }}</td>
+        <td>{{ producto.stock }}</td>
+        <td>
+          <a [routerLink]="['/catalogo/productos', producto.id, 'editar']">Editar</a>
+          <button (click)="eliminar(producto.id)">Eliminar</button>
+        </td>
+      </tr>
+    } @empty {
+      @if (!loading() && !error()) {
+        <tr>
+          <td colspan="5">No hay productos registrados.</td>
+        </tr>
+      }
+    }
+  </tbody>
+</table>
