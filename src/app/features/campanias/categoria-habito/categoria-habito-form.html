@@ -5,20 +5,20 @@
     <p>Cargando...</p>
   }
 
-  <label>
-    Nombre
-    <input type="text" formControlName="nombre" />
-  </label>
+  <mat-form-field>
+    <mat-label>Nombre</mat-label>
+    <input matInput type="text" formControlName="nombre" />
+  </mat-form-field>
   <app-mensaje-error [texto]="mensajeValidacion('nombre')" />
 
-  <label>
-    Descripcion
-    <textarea formControlName="descripcion"></textarea>
-  </label>
+  <mat-form-field>
+    <mat-label>Descripcion</mat-label>
+    <textarea matInput formControlName="descripcion"></textarea>
+  </mat-form-field>
   <app-mensaje-error [texto]="mensajeValidacion('descripcion')" />
 
   <app-mensaje-error [texto]="error()" />
 
-  <button type="submit" [disabled]="loading() || errorCarga()">Guardar</button>
-  <button type="button" (click)="cancelar()">Cancelar</button>
+  <button matButton="filled" type="submit" [disabled]="loading() || errorCarga()">Guardar</button>
+  <button matButton type="button" (click)="cancelar()">Cancelar</button>
 </form>

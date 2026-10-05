@@ -4,10 +4,11 @@ import { RouterLink } from '@angular/router';
 import { CategoriaHabitoService } from './categoria-habito-service';
 import { CategoriaHabito } from './categoria-habito.model';
 import { MensajeError } from '../../../shared/mensaje-error/mensaje-error';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-categoria-habito-list',
-  imports: [RouterLink, MensajeError],
+  imports: [RouterLink, MensajeError, MatButtonModule],
   templateUrl: './categoria-habito-list.html',
 })
 export class CategoriaHabitoList implements OnInit {

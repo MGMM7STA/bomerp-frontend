@@ -6,7 +6,7 @@
 
 <app-mensaje-error [texto]="error()" />
 
-<a routerLink="/campanias/categorias-habito/nueva">Nueva categoria de habito</a>
+<a matButton="filled" routerLink="/campanias/categorias-habito/nueva">Nueva categoria de habito</a>
 
 <table>
   <thead>
@@ -24,8 +24,8 @@
         <td>{{ categoria.nombre }}</td>
         <td>{{ categoria.descripcion }}</td>
         <td>
-          <a [routerLink]="['/campanias/categorias-habito', categoria.id, 'editar']">Editar</a>
-          <button (click)="eliminar(categoria.id!, categoria.nombre)">Eliminar</button>
+          <a matButton [routerLink]="['/campanias/categorias-habito', categoria.id, 'editar']">Editar</a>
+          <button matButton class="eliminar" (click)="eliminar(categoria.id!, categoria.nombre)">Eliminar</button>
         </td>
       </tr>
     } @empty {
