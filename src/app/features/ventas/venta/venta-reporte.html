@@ -1,0 +1,47 @@
+@if (loading()) {
+  <p>Cargando reporte...</p>
+}
+@if (error()) {
+  <p class="error">{{ error() }}</p>
+}
+
+<label>
+  Filtrar por estado
+  <select #filtro (change)="filtrarPorEstado(filtro.value)">
+    <option value="">Todos</option>
+    <option value="REGISTRADA">Registrada</option>
+  </select>
+</label>
+
+@if (reporte(); as r) {
+  <section>
+    <p>Total de ventas: {{ r.agregado.totalVentas }}</p>
+    <p>Monto total: {{ r.agregado.montoTotal | currency: 'PEN' : 'S/ ' }}</p>
+    <p>Ticket promedio: {{ r.agregado.ticketPromedio | currency: 'PEN' : 'S/ ' }}</p>
+  </section>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Fecha</th>
+        <th>Estado</th>
+        <th>Líneas</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (venta of r.ventas; track venta.id) {
+        <tr>
+          <td>{{ venta.fecha | date: 'short' }}</td>
+          <td>{{ venta.estado }}</td>
+          <td>{{ venta.cantidadDetalles }}</td>
+          <td>{{ venta.total | currency: 'PEN' : 'S/ ' }}</td>
+        </tr>
+      } @empty {
+        <tr>
+          <td colspan="4">No hay ventas registradas para este filtro.</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+}

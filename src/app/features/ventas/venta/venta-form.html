@@ -1,0 +1,46 @@
+<form [formGroup]="form">
+  @if (error()) {
+    <p class="error">{{ error() }}</p>
+  }
+
+  <table formArrayName="detalles">
+    <thead>
+      <tr>
+        <th>Producto</th>
+        <th>Cantidad</th>
+        <th>Subtotal</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (linea of lineasForm.controls; track $index) {
+        <tr [formGroupName]="$index">
+          <td>
+            <select formControlName="productoId">
+              <option [ngValue]="0" disabled>Selecciona un producto</option>
+              @for (producto of productos(); track producto.id) {
+                <option [ngValue]="producto.id">{{ producto.nombre }}</option>
+              }
+            </select>
+          </td>
+          <td>
+            <input type="number" step="1" min="1" formControlName="cantidad" />
+          </td>
+          <td>{{ subtotales()[$index] | currency: 'PEN' : 'S/ ' }}</td>
+          <td>
+            <button type="button" (click)="quitarLinea($index)">Quitar</button>
+          </td>
+        </tr>
+      }
+    </tbody>
+    <tfoot>
+      <tr>
+        <td colspan="2">Total</td>
+        <td>{{ total() | currency: 'PEN' : 'S/ ' }}</td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <button type="button" (click)="agregarLinea()">Agregar línea</button>
+  <button type="button" (click)="confirmarYGuardar()" [disabled]="loading()">Registrar venta</button>
+</form>

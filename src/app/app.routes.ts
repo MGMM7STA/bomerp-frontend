@@ -75,6 +75,15 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/campanias/habito/habito-form').then((m) => m.HabitoForm),
       },
+      {
+        path: 'ventas/nueva',
+        loadComponent: () => import('./features/ventas/venta/venta-form').then((m) => m.VentaForm),
+      },
+      {
+        path: 'ventas/reporte',
+        loadComponent: () =>
+          import('./features/ventas/venta/venta-reporte').then((m) => m.VentaReporteComponent),
+      },
     ],
   },
 ];
