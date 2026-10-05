@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ApiService } from '../../../core/services/api-service';
-import { VentaRequest, VentaResponse, VentaReporte } from './venta.model';
+import { VentaRequest, VentaResponse } from './venta.model';
 
 @Injectable({ providedIn: 'root' })
 export class VentaService {
@@ -14,11 +14,21 @@ export class VentaService {
     return this.http.post<VentaResponse>(this.api.buildUrl(this.resource), venta);
   }
 
-  reporte(estado?: string, desde?: string, hasta?: string): Observable<VentaReporte> {
-    let params = new HttpParams();
+  buscar(
+    estado?: string,
+    desde?: string,
+    hasta?: string,
+    ordenarPor = 'fecha',
+    direccion = 'DESC',
+  ): Observable<VentaResponse[]> {
+    let params = new HttpParams().set('ordenarPor', ordenarPor).set('direccion', direccion);
     if (estado) params = params.set('estado', estado);
     if (desde) params = params.set('desde', desde);
     if (hasta) params = params.set('hasta', hasta);
-    return this.http.get<VentaReporte>(this.api.buildUrl(`${this.resource}/resumen`), { params });
+    return this.http.get<VentaResponse[]>(this.api.buildUrl(this.resource), { params });
+  }
+
+  anular(id: number): Observable<VentaResponse> {
+    return this.http.patch<VentaResponse>(this.api.buildUrl(`${this.resource}/${id}/anular`), {});
   }
 }

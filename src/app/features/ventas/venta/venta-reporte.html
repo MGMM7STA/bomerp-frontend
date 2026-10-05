@@ -10,36 +10,79 @@
   <select #filtro (change)="filtrarPorEstado(filtro.value)">
     <option value="">Todos</option>
     <option value="REGISTRADA">Registrada</option>
+    <option value="ANULADA">Anulada</option>
   </select>
 </label>
 
-@if (reporte(); as r) {
+<label>
+  Desde
+  <input type="date" #desde />
+</label>
+
+<label>
+  Hasta
+  <input type="date" #hasta />
+</label>
+
+<button type="button" (click)="filtrarPorFecha(desde.value, hasta.value)">Filtrar por fecha</button>
+
+@if (!loading() && !error()) {
   <section>
-    <p>Total de ventas: {{ r.agregado.totalVentas }}</p>
-    <p>Monto total: {{ r.agregado.montoTotal | currency: 'PEN' : 'S/ ' }}</p>
-    <p>Ticket promedio: {{ r.agregado.ticketPromedio | currency: 'PEN' : 'S/ ' }}</p>
+    <p>Total de ventas: {{ totalVentas() }}</p>
+    <p>Monto total: {{ montoTotal() | currency: 'PEN' : 'S/ ' }}</p>
+    <p>Ticket promedio: {{ ticketPromedio() | currency: 'PEN' : 'S/ ' }}</p>
   </section>
 
-  <table>
+  <table class="reporte-ventas">
     <thead>
       <tr>
         <th>Fecha</th>
         <th>Estado</th>
         <th>Líneas</th>
         <th>Total</th>
+        <th></th>
       </tr>
     </thead>
     <tbody>
-      @for (venta of r.ventas; track venta.id) {
-        <tr>
+      @for (venta of ventas(); track venta.id) {
+        <tr class="fila-venta">
           <td>{{ venta.fecha | date: 'short' }}</td>
           <td>{{ venta.estado }}</td>
-          <td>{{ venta.cantidadDetalles }}</td>
+          <td>{{ venta.detalles.length }}</td>
           <td>{{ venta.total | currency: 'PEN' : 'S/ ' }}</td>
+          <td>
+            @if (venta.estado === 'REGISTRADA') {
+              <button type="button" (click)="anular(venta.id)">Anular</button>
+            }
+          </td>
+        </tr>
+        <tr class="fila-detalle">
+          <td colspan="5">
+            <table class="tabla-detalle">
+              <thead>
+                <tr>
+                  <th>Producto</th>
+                  <th>Cantidad</th>
+                  <th>Precio unitario</th>
+                  <th>Subtotal</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (detalle of venta.detalles; track detalle.productoId) {
+                  <tr>
+                    <td>{{ detalle.nombreProducto }}</td>
+                    <td>{{ detalle.cantidad }}</td>
+                    <td>{{ detalle.precioUnitario | currency: 'PEN' : 'S/ ' }}</td>
+                    <td>{{ detalle.subtotal | currency: 'PEN' : 'S/ ' }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </td>
         </tr>
       } @empty {
         <tr>
-          <td colspan="4">No hay ventas registradas para este filtro.</td>
+          <td colspan="5">No hay ventas registradas para este filtro.</td>
         </tr>
       }
     </tbody>

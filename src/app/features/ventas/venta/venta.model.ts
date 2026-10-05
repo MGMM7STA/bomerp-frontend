@@ -22,22 +22,3 @@ export interface VentaResponse {
   total: number;
   detalles: DetalleVentaResponse[];
 }
-
-export interface VentaResumen {
-  id: number;
-  fecha: string;
-  estado: string;
-  total: number;
-  cantidadDetalles: number;
-}
-
-export interface VentaAgregado {
-  totalVentas: number;
-  montoTotal: number;
-  ticketPromedio: number;
-}
-
-export interface VentaReporte {
-  agregado: VentaAgregado;
-  ventas: VentaResumen[];
-}

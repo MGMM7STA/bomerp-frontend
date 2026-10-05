@@ -7,22 +7,34 @@
     <thead>
       <tr>
         <th>Producto</th>
+        <th>Precio unitario</th>
         <th>Cantidad</th>
         <th>Subtotal</th>
         <th></th>
       </tr>
     </thead>
     <tbody>
-      @for (linea of lineasForm.controls; track $index) {
+      @for (linea of lineasForm.controls; track linea) {
         <tr [formGroupName]="$index">
           <td>
-            <select formControlName="productoId">
-              <option [ngValue]="0" disabled>Selecciona un producto</option>
-              @for (producto of productos(); track producto.id) {
-                <option [ngValue]="producto.id">{{ producto.nombre }}</option>
-              }
-            </select>
+            <mat-form-field>
+              <input
+                type="text"
+                matInput
+                formControlName="busqueda"
+                [matAutocomplete]="auto"
+                placeholder="Buscar producto"
+              />
+              <mat-autocomplete #auto="matAutocomplete" (optionSelected)="seleccionarProducto($index, $event)">
+                @for (producto of opcionesPorLinea()[$index]; track producto.id) {
+                  <mat-option [value]="producto">
+                    {{ producto.nombre }} — {{ producto.precio | currency: 'PEN' : 'S/ ' }}
+                  </mat-option>
+                }
+              </mat-autocomplete>
+            </mat-form-field>
           </td>
+          <td>{{ preciosUnitarios()[$index] | currency: 'PEN' : 'S/ ' }}</td>
           <td>
             <input type="number" step="1" min="1" formControlName="cantidad" />
           </td>
@@ -35,12 +47,12 @@
     </tbody>
     <tfoot>
       <tr>
-        <td colspan="2">Total</td>
+        <td colspan="3">Total</td>
         <td>{{ total() | currency: 'PEN' : 'S/ ' }}</td>
       </tr>
     </tfoot>
   </table>
 
-  <button type="button" (click)="agregarLinea()">Agregar línea</button>
+  <button type="button" (click)="agregarLinea()">Agregar linea</button>
   <button type="button" (click)="confirmarYGuardar()" [disabled]="loading()">Registrar venta</button>
 </form>
