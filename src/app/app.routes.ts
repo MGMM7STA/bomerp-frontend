@@ -60,6 +60,21 @@ export const routes: Routes = [
             (m) => m.CategoriaHabitoForm,
           ),
       },
+      {
+        path: 'campanias/habitos',
+        loadComponent: () =>
+          import('./features/campanias/habito/habito-list').then((m) => m.HabitoList),
+      },
+      {
+        path: 'campanias/habitos/nuevo',
+        loadComponent: () =>
+          import('./features/campanias/habito/habito-form').then((m) => m.HabitoForm),
+      },
+      {
+        path: 'campanias/habitos/:id/editar',
+        loadComponent: () =>
+          import('./features/campanias/habito/habito-form').then((m) => m.HabitoForm),
+      },
     ],
   },
 ];

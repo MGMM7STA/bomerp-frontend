@@ -1,0 +1,55 @@
+<h2>Habitos</h2>
+
+@if (loading()) {
+  <p>Cargando habitos...</p>
+}
+
+<app-mensaje-error [texto]="error()" />
+
+<a matButton="filled" routerLink="/campanias/habitos/nuevo">Nuevo habito</a>
+
+<mat-form-field>
+  <mat-label>Filtrar por categoria de habito</mat-label>
+  <mat-select [value]="0" (selectionChange)="filtrar($event.value)">
+    <mat-option [value]="0">Todas</mat-option>
+    @for (categoria of categorias(); track categoria.id) {
+      <mat-option [value]="categoria.id">{{ categoria.nombre }}</mat-option>
+    }
+  </mat-select>
+</mat-form-field>
+
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Nombre</th>
+      <th>Categoria</th>
+      <th>Puntaje base</th>
+      <th>Activo</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    @for (habito of habitos(); track habito.id) {
+      <tr>
+        <td>{{ habito.id }}</td>
+        <td>{{ habito.nombre }}</td>
+        <td>{{ habito.categoria.nombre }}</td>
+        <td>{{ habito.puntajeBase }}</td>
+        <td>{{ habito.activo === 1 ? 'Si' : 'No' }}</td>
+        <td>
+          <a matButton [routerLink]="['/campanias/habitos', habito.id, 'editar']">Editar</a>
+          <button matButton class="eliminar" (click)="eliminar(habito.id, habito.nombre)">
+            Eliminar
+          </button>
+        </td>
+      </tr>
+    } @empty {
+      @if (!loading() && !error()) {
+        <tr>
+          <td colspan="6">No hay habitos registrados.</td>
+        </tr>
+      }
+    }
+  </tbody>
+</table>

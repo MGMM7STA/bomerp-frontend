@@ -3,3 +3,8 @@ export interface CategoriaHabito {
   nombre: string;
   descripcion?: string;
 }
+
+export interface CategoriaHabitoResumen {
+  id: number;
+  nombre: string;
+}
