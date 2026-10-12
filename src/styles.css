@@ -48,3 +48,41 @@ button.eliminar * {
   padding: 0.25rem 0.5rem;
   font-size: 0.9em;
 }
+.aviso {
+  color: #0f5132;
+  background: #d1e7dd;
+  border-radius: 4px;
+  padding: 0.5rem 0.75rem;
+}
+
+.agregados {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  background: #f4f4f4;
+  border-radius: 4px;
+  padding: 0.5rem 0.75rem;
+}
+
+.agregados p {
+  margin: 0.25rem 0;
+}
+
+.filtros p {
+  margin: 0.4rem 0;
+}
+
+.registro {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.registro header {
+  margin-bottom: 0.5rem;
+}
+
+.registro .estado {
+  font-weight: 600;
+}

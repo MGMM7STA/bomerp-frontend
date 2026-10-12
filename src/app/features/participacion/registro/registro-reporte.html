@@ -1,0 +1,92 @@
+<h2>Reporte de participacion</h2>
+
+@if (error()) {
+  <p class="error">{{ error() }}</p>
+}
+@if (aviso()) {
+  <p class="aviso">{{ aviso() }}</p>
+}
+
+<section class="agregados">
+  <p><strong>Registros:</strong> {{ totalRegistros() }}</p>
+  <p><strong>Evidencias totales:</strong> {{ evidenciasTotales() }}</p>
+  <p><strong>Puntaje acumulado:</strong> {{ puntajeAcumulado() | number: '1.2-2' }} pts</p>
+  <p><strong>Puntaje promedio por registro:</strong> {{ puntajePromedio() | number: '1.2-2' }} pts</p>
+  <p><strong>Habito mas registrado:</strong> {{ habitoMasRegistrado() }}</p>
+</section>
+
+<section class="filtros">
+  <p>
+    <strong>Estado:</strong>
+    <button type="button" (click)="filtrarPorEstado('')">Todos</button>
+    <button type="button" (click)="filtrarPorEstado('ENVIADO')">Enviados</button>
+    <button type="button" (click)="filtrarPorEstado('VALIDADO')">Validados</button>
+    <button type="button" (click)="filtrarPorEstado('ANULADO')">Anulados</button>
+  </p>
+
+  <p>
+    <strong>Rango de fechas:</strong>
+    <input type="date" #desde />
+    <input type="date" #hasta />
+    <button type="button" (click)="aplicarRangoFechas(desde.value, hasta.value)">Aplicar</button>
+    <button type="button" (click)="desde.value = ''; hasta.value = ''; limpiarFiltros()">
+      Limpiar filtros
+    </button>
+  </p>
+</section>
+
+@if (loading()) {
+  <p>Cargando...</p>
+}
+
+@if (!loading() && registros().length === 0) {
+  <p>No hay registros para los filtros aplicados.</p>
+}
+
+@for (registro of registros(); track registro.id) {
+  <article class="registro">
+    <header>
+      <strong>Registro {{ registro.id }}</strong>
+      — Estudiante {{ registro.estudianteId }}
+      — {{ registro.fecha | date: 'dd/MM/yyyy HH:mm' }}
+      — <span class="estado">{{ registro.estado }}</span>
+      @if (registro.estado !== 'ANULADO') {
+        <button type="button" (click)="anular(registro)">Anular</button>
+      }
+    </header>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Habito</th>
+          <th>Descripcion</th>
+          <th>Puntaje unitario</th>
+          <th>Veces</th>
+          <th>Subtotal</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (detalle of registro.detalles; track $index) {
+          <tr>
+            <td>{{ detalle.nombreHabito }}</td>
+            <td>{{ detalle.descripcion || '-' }}</td>
+            <td>{{ detalle.puntajeUnitario | number: '1.2-2' }} pts</td>
+            <td>{{ detalle.veces }}</td>
+            <td>{{ detalle.subtotal | number: '1.2-2' }} pts</td>
+          </tr>
+        }
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="3">Total del registro</td>
+          <td>{{ registro.totalEvidencias }}</td>
+          <td>{{ registro.puntajeTotal | number: '1.2-2' }} pts</td>
+        </tr>
+      </tfoot>
+    </table>
+  </article>
+}
+
+<p>
+  <a routerLink="/participacion/nuevo">Registrar nueva participacion</a>
+</p>

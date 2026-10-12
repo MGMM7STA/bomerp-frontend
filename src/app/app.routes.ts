@@ -84,6 +84,18 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/ventas/venta/venta-reporte').then((m) => m.VentaReporteComponent),
       },
+      {
+        path: 'participacion/nuevo',
+        loadComponent: () =>
+          import('./features/participacion/registro/registro-form').then((m) => m.RegistroForm),
+      },
+      {
+        path: 'participacion/reporte',
+        loadComponent: () =>
+          import('./features/participacion/registro/registro-reporte').then(
+            (m) => m.RegistroReporteComponent,
+          ),
+      },
     ],
   },
 ];

@@ -1,0 +1,88 @@
+<h2>Registrar participacion diaria</h2>
+
+<form [formGroup]="form">
+  @if (error()) {
+    <p class="error">{{ error() }}</p>
+  }
+
+  <p>
+    <label>
+      Estudiante
+      <input type="number" step="1" min="1" formControlName="estudianteId" />
+    </label>
+  </p>
+
+  <table formArrayName="detalles">
+    <thead>
+      <tr>
+        <th>Habito</th>
+        <th>Puntaje unitario</th>
+        <th>Veces</th>
+        <th>Descripcion</th>
+        <th>URL de la foto</th>
+        <th>Subtotal</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (linea of lineasForm.controls; track linea) {
+        <tr [formGroupName]="$index">
+          <td>
+            <mat-form-field>
+              <input
+                type="text"
+                matInput
+                formControlName="busqueda"
+                [matAutocomplete]="auto"
+                placeholder="Buscar habito"
+              />
+              <mat-autocomplete #auto="matAutocomplete" (optionSelected)="seleccionarHabito($index, $event)">
+                @for (habito of opcionesPorLinea()[$index]; track habito.id) {
+                  <mat-option [value]="habito">
+                    {{ habito.nombre }} — {{ habito.puntajeBase | number: '1.2-2' }} pts
+                  </mat-option>
+                }
+              </mat-autocomplete>
+            </mat-form-field>
+          </td>
+          <td>{{ puntajesUnitarios()[$index] | number: '1.2-2' }} pts</td>
+          <td>
+            <input type="number" step="1" min="1" formControlName="veces" />
+          </td>
+          <td>
+            <input type="text" formControlName="descripcion" placeholder="Opcional" />
+          </td>
+          <td>
+            <input type="text" formControlName="urlImagen" placeholder="Opcional" />
+          </td>
+          <td>{{ subtotales()[$index] | number: '1.2-2' }} pts</td>
+          <td>
+            <button type="button" (click)="quitarLinea($index)" [disabled]="lineasForm.length === 1">
+              Quitar
+            </button>
+          </td>
+        </tr>
+      }
+    </tbody>
+    <tfoot>
+      <tr>
+        <td colspan="2">Evidencias totales</td>
+        <td>{{ totalEvidencias() }}</td>
+        <td colspan="2">Puntaje total</td>
+        <td>{{ puntajeTotal() | number: '1.2-2' }} pts</td>
+        <td></td>
+      </tr>
+    </tfoot>
+  </table>
+
+  @if (!coleccionValida()) {
+    <p class="error">
+      El registro necesita al menos una evidencia, con su habito elegido de la lista y un numero de veces de al menos 1.
+    </p>
+  }
+
+  <button type="button" (click)="agregarLinea()">Agregar evidencia</button>
+  <button type="button" (click)="confirmarYGuardar()" [disabled]="loading()">
+    Registrar participacion
+  </button>
+</form>
