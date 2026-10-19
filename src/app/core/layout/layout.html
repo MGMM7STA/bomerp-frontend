@@ -5,21 +5,34 @@
     </a>
     BomERP
   </h1>
+
+  @if (auth.autenticado()) {
+    <span class="user">{{ auth.usuario()?.nombre }}</span>
+    <button type="button" (click)="auth.cerrarSesion()">Cerrar sesion</button>
+  } @else {
+    <button type="button" (click)="auth.iniciarLogin()">Iniciar sesion</button>
+  }
 </header>
 
 <div class="body">
-  <aside class="sidebar">
-    <nav>
-      <a routerLink="/catalogo/categorias" routerLinkActive="active">Categorias</a>
-      <a routerLink="/campanias/categorias-habito" routerLinkActive="active">Categorias de habito</a>
-      <a routerLink="/catalogo/productos" routerLinkActive="active">Productos</a>
-      <a routerLink="/campanias/habitos" routerLinkActive="active">Habitos</a>
-      <a routerLink="/ventas/nueva" routerLinkActive="active">Nueva venta</a>
-      <a routerLink="/ventas/reporte" routerLinkActive="active">Reporte de ventas</a>
-      <a routerLink="/participacion/nuevo" routerLinkActive="active">Nueva participacion</a>
-      <a routerLink="/participacion/reporte" routerLinkActive="active">Reporte de participacion</a>
-    </nav>
-  </aside>
+  @if (auth.autenticado()) {
+    <aside class="sidebar">
+      <nav>
+        <a routerLink="/catalogo/categorias" routerLinkActive="active">Categorias</a>
+        <a routerLink="/campanias/categorias-habito" routerLinkActive="active">Categorias de habito</a>
+        <a routerLink="/catalogo/productos" routerLinkActive="active">Productos</a>
+        <a routerLink="/campanias/habitos" routerLinkActive="active">Habitos</a>
+        @if (auth.tieneRol('VENDEDOR', 'SUPERVISOR')) {
+          <a routerLink="/ventas/nueva" routerLinkActive="active">Nueva venta</a>
+        }
+        <a routerLink="/ventas/reporte" routerLinkActive="active">Reporte de ventas</a>
+        @if (auth.tieneRol('VENDEDOR', 'SUPERVISOR')) {
+          <a routerLink="/participacion/nuevo" routerLinkActive="active">Nueva participacion</a>
+        }
+        <a routerLink="/participacion/reporte" routerLinkActive="active">Reporte de participacion</a>
+      </nav>
+    </aside>
+  }
 
   <main class="content">
     <router-outlet />

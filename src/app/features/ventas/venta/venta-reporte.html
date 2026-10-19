@@ -51,7 +51,7 @@
           <td>{{ venta.detalles.length }}</td>
           <td>{{ venta.total | currency: 'PEN' : 'S/ ' }}</td>
           <td>
-            @if (venta.estado === 'REGISTRADA') {
+            @if (venta.estado === 'REGISTRADA' && auth.tieneRol('SUPERVISOR', 'ADMIN')) {
               <button type="button" (click)="anular(venta.id)">Anular</button>
             }
           </td>

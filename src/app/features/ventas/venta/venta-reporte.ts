@@ -2,7 +2,7 @@ import { CurrencyPipe, DatePipe } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { VentaService } from './venta-service';
 import { VentaResponse } from './venta.model';
-
+import { AuthService } from '../../../core/auth/auth-service';
 @Component({
   selector: 'app-venta-reporte',
   imports: [CurrencyPipe, DatePipe],
@@ -17,7 +17,7 @@ export class VentaReporteComponent implements OnInit {
   protected readonly hastaFiltro = signal('');
   protected readonly error = signal<string | null>(null);
   protected readonly loading = signal(false);
-
+  protected readonly auth = inject(AuthService);
   protected readonly totalVentas = computed(() => this.ventas().length);
   protected readonly montoTotal = computed(() =>
     this.ventas().reduce((suma, v) => suma + v.total, 0),
