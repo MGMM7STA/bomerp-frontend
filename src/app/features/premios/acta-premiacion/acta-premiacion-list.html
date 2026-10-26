@@ -1,0 +1,293 @@
+
+<section class="page">
+  <header class="page-header">
+    <div>
+      <span class="eyebrow">BOMERP · PREMIACIÓN</span>
+      <h1>Actas de premiación</h1>
+      <p>Registra, consulta y gestiona las actas de premiación.</p>
+    </div>
+
+    <button class="btn btn-primary"
+      (click)="abrirFormulario()"
+      [disabled]="formularioAbierto">
+      + Nueva acta
+    </button>
+  </header>
+
+  @if (mensaje) {
+    <div class="alert success">{{ mensaje }}</div>
+  }
+
+  @if (error) {
+    <div class="alert error">{{ error }}</div>
+  }
+
+  @if (formularioAbierto) {
+    <section class="panel">
+      <div class="panel-heading">
+        <div>
+          <h2>Registrar nueva acta</h2>
+          <p>Completa los datos generales y agrega los detalles.</p>
+        </div>
+        <button class="btn btn-light" (click)="cancelar()">Cancelar</button>
+      </div>
+
+      <form (ngSubmit)="emitir()">
+        <div class="form-grid">
+          <label>
+            ID de campaña
+            <input type="number" name="campaniaId"
+              [(ngModel)]="campaniaId" min="1" required>
+          </label>
+
+          <label>
+            Fecha inicial del período
+            <input type="date" name="fechaInicio"
+              [(ngModel)]="fechaInicioPeriodo" required>
+          </label>
+
+          <label>
+            Fecha final del período
+            <input type="date" name="fechaFin"
+              [(ngModel)]="fechaFinPeriodo" required>
+          </label>
+        </div>
+
+        <div class="section-heading">
+          <div>
+            <h3>Detalles de premiación</h3>
+            <p>Agrega un registro por cada estudiante y premio asignado.</p>
+          </div>
+          <span class="counter">{{ detalles.length }} agregado(s)</span>
+        </div>
+
+        <div class="form-grid detail-form">
+          <label>
+            ID del estudiante
+            <input type="number" name="estudianteId"
+              [(ngModel)]="nuevoDetalle.estudianteId" min="1" required>
+          </label>
+
+          <label>
+            ID del premio
+            <input type="number" name="premioId"
+              [(ngModel)]="nuevoDetalle.premioId" min="1" required>
+          </label>
+
+          <label>
+            Posición
+            <input type="number" name="posicion"
+              [(ngModel)]="nuevoDetalle.posicion" min="1" required>
+          </label>
+
+          <label>
+            Cantidad
+            <input type="number" name="cantidad"
+              [(ngModel)]="nuevoDetalle.cantidad" min="1" required>
+          </label>
+
+          <label>
+            Puntaje alcanzado
+            <input type="number" name="puntaje"
+              [(ngModel)]="nuevoDetalle.puntajeAlcanzado"
+              min="0" step="any" required>
+          </label>
+
+          <div class="field-action">
+            <button type="button" class="btn btn-secondary"
+              (click)="agregarDetalle()">
+              + Agregar detalle
+            </button>
+          </div>
+        </div>
+
+        @if (detalles.length > 0) {
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Estudiante ID</th>
+                  <th>Premio ID</th>
+                  <th>Posición</th>
+                  <th>Cantidad</th>
+                  <th>Puntaje</th>
+                  <th>Acción</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (detalle of detalles; track $index) {
+                  <tr>
+                    <td>{{ $index + 1 }}</td>
+                    <td>{{ detalle.estudianteId }}</td>
+                    <td>{{ detalle.premioId }}</td>
+                    <td>{{ detalle.posicion }}</td>
+                    <td>{{ detalle.cantidad }}</td>
+                    <td>{{ detalle.puntajeAlcanzado }}</td>
+                    <td>
+                      <button type="button" class="btn btn-danger btn-small"
+                        (click)="quitarDetalle($index)">
+                        Quitar
+                      </button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-light"
+            (click)="cancelar()">Cancelar</button>
+          <button type="submit" class="btn btn-primary"
+            [disabled]="guardando">
+            {{ guardando ? 'Emitiendo...' : 'Emitir acta' }}
+          </button>
+        </div>
+      </form>
+    </section>
+  }
+
+  <section class="panel">
+    <div class="panel-heading">
+      <div>
+        <h2>Actas registradas</h2>
+        <p>Consulta los datos y el estado de cada acta.</p>
+      </div>
+      <button class="btn btn-light" (click)="listar()"
+        [disabled]="cargando">
+        ↻ Actualizar
+      </button>
+    </div>
+
+    @if (cargando) {
+      <div class="empty-state">Cargando actas...</div>
+    } @else if (actas.length === 0) {
+      <div class="empty-state">
+        <span class="empty-icon">▤</span>
+        <h3>No hay actas para mostrar</h3>
+        <p>Cuando registres una acta, aparecerá en esta lista.</p>
+      </div>
+    } @else {
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Campaña</th>
+              <th>Período</th>
+              <th>Emisión</th>
+              <th>Ganadores</th>
+              <th>Premios entregados</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (acta of actas; track acta.id) {
+              <tr>
+                <td>#{{ acta.id }}</td>
+                <td>{{ acta.campaniaId }}</td>
+                <td>
+                  {{ acta.fechaInicioPeriodo }} —
+                  {{ acta.fechaFinPeriodo }}
+                </td>
+                <td>{{ acta.fechaEmision }}</td>
+                <td>{{ acta.totalGanadores }}</td>
+                <td>{{ acta.totalPremiosEntregados }}</td>
+                <td>
+                  <span class="status"
+                    [class.status-issued]="acta.estado === 'EMITIDA'"
+                    [class.status-cancelled]="acta.estado === 'ANULADA'">
+                    {{ acta.estado }}
+                  </span>
+                </td>
+                <td>
+                  <div class="actions">
+                    <button class="btn btn-secondary btn-small"
+                      (click)="consultar(acta.id)">
+                      Ver
+                    </button>
+                    @if (acta.estado === 'EMITIDA') {
+                      <button class="btn btn-danger btn-small"
+                        (click)="anular(acta)">
+                        Anular
+                      </button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </section>
+
+  @if (actaSeleccionada; as acta) {
+    <section class="panel detail-panel">
+      <div class="panel-heading">
+        <div>
+          <span class="eyebrow">DETALLE DEL REGISTRO</span>
+          <h2>Acta N.º {{ acta.id }}</h2>
+          <p>Campaña: {{ acta.campaniaId }} · Estado: {{ acta.estado }}</p>
+        </div>
+        <button class="btn btn-light"
+          (click)="actaSeleccionada = null">Cerrar</button>
+      </div>
+
+      <div class="summary-grid">
+        <div class="summary-item">
+          <span>Inicio del período</span>
+          <strong>{{ acta.fechaInicioPeriodo }}</strong>
+        </div>
+        <div class="summary-item">
+          <span>Fin del período</span>
+          <strong>{{ acta.fechaFinPeriodo }}</strong>
+        </div>
+        <div class="summary-item">
+          <span>Total de ganadores</span>
+          <strong>{{ acta.totalGanadores }}</strong>
+        </div>
+        <div class="summary-item">
+          <span>Premios entregados</span>
+          <strong>{{ acta.totalPremiosEntregados }}</strong>
+        </div>
+      </div>
+
+      <h3>Detalle de ganadores</h3>
+
+      @if (acta.detalles.length === 0) {
+        <p class="empty-state">Esta acta no contiene detalles.</p>
+      } @else {
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Detalle ID</th>
+                <th>Estudiante ID</th>
+                <th>Premio ID</th>
+                <th>Posición</th>
+                <th>Cantidad</th>
+                <th>Puntaje</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (detalle of acta.detalles; track detalle.id) {
+                <tr>
+                  <td>{{ detalle.id }}</td>
+                  <td>{{ detalle.estudianteId }}</td>
+                  <td>{{ detalle.premioId }}</td>
+                  <td>{{ detalle.posicion }}</td>
+                  <td>{{ detalle.cantidad }}</td>
+                  <td>{{ detalle.puntajeAlcanzado }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </section>
+  }
+</section>

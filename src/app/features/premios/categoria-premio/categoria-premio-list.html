@@ -1,0 +1,130 @@
+
+<section class="categories-page">
+  <div class="page-heading">
+    <div>
+      <span class="eyebrow">GESTIÓN DEL CATÁLOGO</span>
+      <h1>Categorías de premios</h1>
+      <p>Organiza las categorías de los premios del sistema.</p>
+    </div>
+
+    @if (auth.tieneRol('COORDINADOR', 'ADMIN')) {
+      <button class="primary-button" (click)="abrirNuevo()">
+        <span>＋</span> Nueva categoría
+      </button>
+    }
+  </div>
+
+  @if (mensaje) {
+    <div class="notice success">{{ mensaje }}</div>
+  }
+
+  @if (error) {
+    <div class="notice error">{{ error }}</div>
+  }
+
+  @if (formularioAbierto) {
+    <section class="form-card">
+      <div class="form-heading">
+        <div>
+          <h2>{{ editandoId === null ? 'Nueva categoría' : 'Editar categoría' }}</h2>
+          <p>Completa la información solicitada.</p>
+        </div>
+        <button class="close-button" type="button" (click)="cancelar()">×</button>
+      </div>
+
+      <form (ngSubmit)="guardar()">
+        <div class="form-field">
+          <label for="nombre">Nombre *</label>
+          <input
+            id="nombre"
+            name="nombre"
+            [(ngModel)]="nombre"
+            placeholder="Ej. Excelencia académica"
+            maxlength="100"
+            required
+          />
+        </div>
+
+        <div class="form-field">
+          <label for="descripcion">Descripción</label>
+          <textarea
+            id="descripcion"
+            name="descripcion"
+            [(ngModel)]="descripcion"
+            placeholder="Describe la categoría..."
+            rows="3"
+          ></textarea>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="secondary-button" (click)="cancelar()">
+            Cancelar
+          </button>
+          <button type="submit" class="primary-button" [disabled]="guardando">
+            {{ guardando ? 'Guardando...' : 'Guardar categoría' }}
+          </button>
+        </div>
+      </form>
+    </section>
+  }
+
+  <section class="table-card">
+    <div class="table-heading">
+      <div>
+        <h2>Listado de categorías</h2>
+        <p>{{ categorias.length }} registros cargados</p>
+      </div>
+      <button class="secondary-button" (click)="listar()">↻ Actualizar</button>
+    </div>
+
+    @if (cargando) {
+      <div class="empty-state">Cargando categorías...</div>
+    } @else if (error) {
+      <div class="empty-state">
+        <h3>No se pudieron cargar las categorías</h3>
+        <p>{{ error }}</p>
+        <button class="secondary-button" (click)="listar()">Reintentar</button>
+      </div>
+    } @else if (categorias.length === 0) {
+      <div class="empty-state">
+        <div class="empty-icon">▦</div>
+        <h3>No hay categorías para mostrar</h3>
+        <p>Cuando existan registros en el backend, aparecerán aquí.</p>
+      </div>
+    } @else {
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nombre</th>
+              <th>Descripción</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (categoria of categorias; track categoria.id) {
+              <tr>
+                <td><span class="id-chip">#{{ categoria.id }}</span></td>
+                <td><strong>{{ categoria.nombre }}</strong></td>
+                <td>{{ categoria.descripcion || 'Sin descripción' }}</td>
+                <td>
+                  @if (auth.tieneRol('COORDINADOR', 'ADMIN')) {
+                    <div class="row-actions">
+                      <button class="edit-button" (click)="editar(categoria)">
+                        Editar
+                      </button>
+                      <button class="delete-button" (click)="eliminar(categoria)">
+                        Eliminar
+                      </button>
+                    </div>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </section>
+</section>

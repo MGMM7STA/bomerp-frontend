@@ -30,6 +30,11 @@
           <a routerLink="/participacion/nuevo" routerLinkActive="active">Nueva participacion</a>
         }
         <a routerLink="/participacion/reporte" routerLinkActive="active">Reporte de participacion</a>
+        <a routerLink="/premios/categorias" routerLinkActive="active">Categorias de premio</a>
+        <a routerLink="/premios/catalogo" routerLinkActive="active">Premios</a>
+        @if (auth.tieneRol('COORDINADOR', 'ADMIN')) {
+          <a routerLink="/premios/actas" routerLinkActive="active">Actas de premiacion</a>
+        }
       </nav>
     </aside>
   }

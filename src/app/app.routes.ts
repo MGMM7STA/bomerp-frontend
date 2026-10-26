@@ -119,6 +119,28 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'premios/categorias',
+        canActivate: [authGuard],
+        loadComponent: () =>
+          import('./features/premios/categoria-premio/categoria-premio-list').then(
+            (m) => m.CategoriaPremioList,
+          ),
+      },
+      {
+        path: 'premios/catalogo',
+        canActivate: [authGuard],
+        loadComponent: () =>
+          import('./features/premios/premio/premio-list').then((m) => m.PremioList),
+      },
+      {
+        path: 'premios/actas',
+        canActivate: [authGuard, rolGuard('COORDINADOR', 'ADMIN')],
+        loadComponent: () =>
+          import('./features/premios/acta-premiacion/acta-premiacion-list').then(
+            (m) => m.ActaPremiacionList,
+          ),
+      },
+      {
         path: 'sin-permiso',
         loadComponent: () => import('./core/sin-permiso/sin-permiso').then((m) => m.SinPermiso),
       },

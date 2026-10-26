@@ -1,0 +1,184 @@
+
+<section class="premios-page">
+  <div class="page-heading">
+    <div>
+      <span class="eyebrow">GESTIÓN DEL CATÁLOGO</span>
+      <h1>Premios</h1>
+      <p>Administra los premios, sus categorías y las existencias.</p>
+    </div>
+
+    @if (auth.tieneRol('COORDINADOR', 'ADMIN')) {
+      <button class="primary-button" (click)="abrirNuevo()">
+        <span>＋</span> Nuevo premio
+      </button>
+    }
+  </div>
+
+  @if (mensaje) {
+    <div class="notice success">{{ mensaje }}</div>
+  }
+
+  @if (error) {
+    <div class="notice error">{{ error }}</div>
+  }
+
+  @if (formularioAbierto) {
+    <section class="form-card">
+      <div class="form-heading">
+        <div>
+          <h2>{{ editandoId === null ? 'Nuevo premio' : 'Editar premio' }}</h2>
+          <p>Completa la información del premio.</p>
+        </div>
+        <button class="close-button" type="button" (click)="cancelar()">×</button>
+      </div>
+
+      <form (ngSubmit)="guardar()">
+        <div class="form-grid">
+          <div class="form-field">
+            <label for="nombre">Nombre *</label>
+            <input
+              id="nombre"
+              name="nombre"
+              [(ngModel)]="nombre"
+              placeholder="Ej. Kit de bienestar"
+              maxlength="120"
+              required
+            />
+          </div>
+
+          <div class="form-field">
+            <label for="categoriaId">Categoría *</label>
+            <select
+              id="categoriaId"
+              name="categoriaId"
+              [(ngModel)]="categoriaId"
+              required
+            >
+              <option [ngValue]="null" disabled>Selecciona una categoría</option>
+              @for (categoria of categorias; track categoria.id) {
+                <option [ngValue]="categoria.id">{{ categoria.nombre }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="form-field">
+            <label for="stock">Stock *</label>
+            <input
+              id="stock"
+              name="stock"
+              type="number"
+              min="0"
+              step="1"
+              [(ngModel)]="stock"
+              required
+            />
+          </div>
+
+          <div class="form-field">
+            <label for="activo">Estado</label>
+            <select id="activo" name="activo" [(ngModel)]="activo">
+              <option [ngValue]="true">Activo</option>
+              <option [ngValue]="false">Inactivo</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label for="descripcion">Descripción</label>
+          <textarea
+            id="descripcion"
+            name="descripcion"
+            [(ngModel)]="descripcion"
+            placeholder="Describe el premio..."
+            rows="3"
+          ></textarea>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="secondary-button" (click)="cancelar()">
+            Cancelar
+          </button>
+          <button type="submit" class="primary-button" [disabled]="guardando">
+            {{ guardando ? 'Guardando...' : 'Guardar premio' }}
+          </button>
+        </div>
+      </form>
+    </section>
+  }
+
+  <section class="table-card">
+    <div class="table-heading">
+      <div>
+        <h2>Listado de premios</h2>
+        <p>{{ premios.length }} registros cargados</p>
+      </div>
+      <button class="secondary-button" (click)="listar()">↻ Actualizar</button>
+    </div>
+
+    <div class="filter-row">
+      <label for="filtroCategoria">Filtrar por categoría</label>
+      <select
+        id="filtroCategoria"
+        name="filtroCategoria"
+        [(ngModel)]="filtroCategoriaId"
+        (ngModelChange)="listar()"
+      >
+        <option [ngValue]="null">Todas las categorías</option>
+        @for (categoria of categorias; track categoria.id) {
+          <option [ngValue]="categoria.id">{{ categoria.nombre }}</option>
+        }
+      </select>
+    </div>
+
+    @if (cargando) {
+      <div class="empty-state">Cargando premios...</div>
+    } @else if (premios.length === 0) {
+      <div class="empty-state">
+        <div class="empty-icon">◇</div>
+        <h3>No hay premios para mostrar</h3>
+        <p>Registra un premio o selecciona otra categoría.</p>
+      </div>
+    } @else {
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Premio</th>
+              <th>Categoría</th>
+              <th>Stock</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (premio of premios; track premio.id) {
+              <tr>
+                <td><span class="id-chip">#{{ premio.id }}</span></td>
+                <td>
+                  <strong>{{ premio.nombre }}</strong>
+                  <p class="description">{{ premio.descripcion || 'Sin descripción' }}</p>
+                </td>
+                <td>{{ premio.categoria?.nombre || 'Sin categoría' }}</td>
+                <td><span class="stock-chip">{{ premio.stock }}</span></td>
+                <td>
+                  <span class="status" [class.active]="premio.activo" [class.inactive]="!premio.activo">
+                    {{ premio.activo ? 'Activo' : 'Inactivo' }}
+                  </span>
+                </td>
+                <td>
+                  @if (auth.tieneRol('COORDINADOR', 'ADMIN')) {
+                    <div class="row-actions">
+                      <button class="edit-button" (click)="editar(premio)">Editar</button>
+                      <button class="delete-button" (click)="eliminar(premio)">Eliminar</button>
+                    </div>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </section>
+</section>
