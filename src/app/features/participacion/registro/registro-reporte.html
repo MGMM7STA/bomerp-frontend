@@ -50,7 +50,7 @@
       — Estudiante {{ registro.estudianteId }}
       — {{ registro.fecha | date: 'dd/MM/yyyy HH:mm' }}
       — <span class="estado">{{ registro.estado }}</span>
-      @if (registro.estado !== 'ANULADO') {
+      @if (registro.estado !== 'ANULADO' && auth.tieneRol('COORDINADOR', 'ADMIN')) {
         <button type="button" (click)="anular(registro)">Anular</button>
       }
     </header>

@@ -61,7 +61,7 @@ export const routes: Routes = [
       },
       {
         path: 'campanias/categorias-habito/nueva',
-        canActivate: [authGuard, rolGuard('ADMIN')],
+        canActivate: [authGuard, rolGuard('COORDINADOR', 'ADMIN')],
         loadComponent: () =>
           import('./features/campanias/categoria-habito/categoria-habito-form').then(
             (m) => m.CategoriaHabitoForm,
@@ -69,7 +69,7 @@ export const routes: Routes = [
       },
       {
         path: 'campanias/categorias-habito/:id/editar',
-        canActivate: [authGuard, rolGuard('ADMIN')],
+        canActivate: [authGuard, rolGuard('COORDINADOR', 'ADMIN')],
         loadComponent: () =>
           import('./features/campanias/categoria-habito/categoria-habito-form').then(
             (m) => m.CategoriaHabitoForm,
@@ -83,13 +83,13 @@ export const routes: Routes = [
       },
       {
         path: 'campanias/habitos/nuevo',
-        canActivate: [authGuard, rolGuard('ADMIN')],
+        canActivate: [authGuard, rolGuard('COORDINADOR', 'ADMIN')],
         loadComponent: () =>
           import('./features/campanias/habito/habito-form').then((m) => m.HabitoForm),
       },
       {
         path: 'campanias/habitos/:id/editar',
-        canActivate: [authGuard, rolGuard('ADMIN')],
+        canActivate: [authGuard, rolGuard('COORDINADOR', 'ADMIN')],
         loadComponent: () =>
           import('./features/campanias/habito/habito-form').then((m) => m.HabitoForm),
       },
@@ -106,7 +106,7 @@ export const routes: Routes = [
       },
       {
         path: 'participacion/nuevo',
-        canActivate: [authGuard, rolGuard('VENDEDOR', 'SUPERVISOR')],
+        canActivate: [authGuard, rolGuard('ESTUDIANTE', 'COORDINADOR')],
         loadComponent: () =>
           import('./features/participacion/registro/registro-form').then((m) => m.RegistroForm),
       },

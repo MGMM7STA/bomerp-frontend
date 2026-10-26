@@ -26,7 +26,7 @@
           <a routerLink="/ventas/nueva" routerLinkActive="active">Nueva venta</a>
         }
         <a routerLink="/ventas/reporte" routerLinkActive="active">Reporte de ventas</a>
-        @if (auth.tieneRol('VENDEDOR', 'SUPERVISOR')) {
+        @if (auth.tieneRol('ESTUDIANTE', 'COORDINADOR')) {
           <a routerLink="/participacion/nuevo" routerLinkActive="active">Nueva participacion</a>
         }
         <a routerLink="/participacion/reporte" routerLinkActive="active">Reporte de participacion</a>

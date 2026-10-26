@@ -4,6 +4,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
 import { RegistroService } from './registro-service';
 import { RegistroResponse } from './registro.model';
+import { AuthService } from '../../../core/auth/auth-service';
 
 @Component({
   selector: 'app-registro-reporte',
@@ -12,6 +13,7 @@ import { RegistroResponse } from './registro.model';
 })
 export class RegistroReporteComponent implements OnInit {
   private readonly registroService = inject(RegistroService);
+  protected readonly auth = inject(AuthService);
 
   protected readonly registros = signal<RegistroResponse[]>([]);
   protected readonly estadoFiltro = signal('');
