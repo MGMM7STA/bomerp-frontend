@@ -12,6 +12,7 @@ export interface RegistroRequest {
 }
 
 export interface DetalleEvidenciaResponse {
+  id: number;
   habitoId: number;
   nombreHabito: string;
   descripcion?: string;
@@ -19,6 +20,9 @@ export interface DetalleEvidenciaResponse {
   puntajeUnitario: number;
   veces: number;
   subtotal: number;
+  estado: EstadoRegistro;
+  motivoRechazo?: string | null;
+  tieneFoto: boolean;
 }
 
 export interface RegistroResponse {
@@ -29,6 +33,7 @@ export interface RegistroResponse {
   estado: EstadoRegistro;
   totalEvidencias: number;
   puntajeTotal: number;
+  puntajeValidado: number;
   motivoRechazo?: string | null;
   revisadoPor?: string | null;
   fechaRevision?: string | null;

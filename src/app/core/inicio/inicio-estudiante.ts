@@ -52,11 +52,15 @@ export class InicioEstudiante implements OnInit {
   );
 
   protected readonly puntosValidados = computed(() =>
-    this.sumar(this.registros().filter((r) => r.estado === 'VALIDADO')),
+    this.registros().reduce((suma, r) => suma + Number(r.puntajeValidado ?? 0), 0),
   );
 
   protected readonly puntosPendientes = computed(() =>
-    this.sumar(this.registros().filter((r) => r.estado === 'ENVIADO')),
+    this.registros()
+      .filter((r) => r.estado === 'ENVIADO')
+      .flatMap((r) => r.detalles)
+      .filter((d) => d.estado === 'ENVIADO')
+      .reduce((suma, d) => suma + Number(d.subtotal), 0),
   );
 
   protected readonly diasActivos = computed(
@@ -78,9 +82,5 @@ export class InicioEstudiante implements OnInit {
     this.registroService.buscar().subscribe({
       next: (data) => this.registros.set(data),
     });
-  }
-
-  private sumar(lista: RegistroResponse[]): number {
-    return lista.reduce((suma, r) => suma + Number(r.puntajeTotal), 0);
   }
 }

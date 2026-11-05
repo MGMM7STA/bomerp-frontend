@@ -2,9 +2,6 @@ import { Component, inject, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
 import { CategoriaHabitoService } from '../categoria-habito/categoria-habito-service';
 import { CategoriaHabito } from '../categoria-habito/categoria-habito.model';
 import { HabitoService } from './habito-service';
@@ -12,14 +9,7 @@ import { MensajeError } from '../../../shared/mensaje-error/mensaje-error';
 
 @Component({
   selector: 'app-habito-form',
-  imports: [
-    ReactiveFormsModule,
-    RouterLink,
-    MensajeError,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-  ],
+  imports: [ReactiveFormsModule, RouterLink, MensajeError],
   templateUrl: './habito-form.html',
 })
 export class HabitoForm {

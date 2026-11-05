@@ -5,6 +5,7 @@ import { RegistroService } from '../registro/registro-service';
 import { EstadoRegistro, RegistroResponse } from '../registro/registro.model';
 import { estiloEstado } from '../../../shared/utilidades/estados';
 import { mensajeDeError } from '../../../shared/utilidades/errores';
+import { FotoEvidencia } from '../../../shared/foto-evidencia/foto-evidencia';
 
 interface Filtro {
   texto: string;
@@ -13,7 +14,7 @@ interface Filtro {
 
 @Component({
   selector: 'app-mis-registros',
-  imports: [RouterLink, DatePipe, DecimalPipe],
+  imports: [RouterLink, DatePipe, DecimalPipe, FotoEvidencia],
   templateUrl: './mis-registros.html',
   styleUrl: './mis-registros.css',
 })
@@ -47,9 +48,7 @@ export class MisRegistros implements OnInit {
   });
 
   protected readonly puntosValidados = computed(() =>
-    this.registros()
-      .filter((r) => r.estado === 'VALIDADO')
-      .reduce((suma, r) => suma + Number(r.puntajeTotal), 0),
+    this.registros().reduce((suma, r) => suma + Number(r.puntajeValidado ?? 0), 0),
   );
 
   ngOnInit(): void {

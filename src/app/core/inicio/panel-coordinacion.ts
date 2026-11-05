@@ -5,6 +5,7 @@ import { CampaniaService } from '../../features/campanias/campania/campania-serv
 import { Campania } from '../../features/campanias/campania/campania.model';
 import { RegistroService } from '../../features/participacion/registro/registro-service';
 import { RegistroResponse } from '../../features/participacion/registro/registro.model';
+import { HabitoService } from '../../features/campanias/habito/habito-service';
 import { claveDia, diasRestantes, etiquetaDia, fechaCorta } from './fechas';
 
 interface Barra {
@@ -22,9 +23,11 @@ interface Barra {
 export class PanelCoordinacion implements OnInit {
   private readonly campaniaService = inject(CampaniaService);
   private readonly registroService = inject(RegistroService);
+  private readonly habitoService = inject(HabitoService);
 
   protected readonly campania = signal<Campania | null>(null);
   protected readonly registros = signal<RegistroResponse[]>([]);
+  private readonly nombresHabito = signal<Map<number, string>>(new Map());
   protected readonly cargando = signal(true);
   protected readonly error = signal<string | null>(null);
 
@@ -32,8 +35,10 @@ export class PanelCoordinacion implements OnInit {
     this.registros().filter((r) => r.estado !== 'ANULADO'),
   );
 
-  private readonly validados = computed(() =>
-    this.registros().filter((r) => r.estado === 'VALIDADO'),
+  private readonly evidenciasValidadas = computed(() =>
+    this.registros()
+      .flatMap((r) => r.detalles)
+      .filter((d) => d.estado === 'VALIDADO'),
   );
 
   protected readonly participantes = computed(
@@ -41,7 +46,7 @@ export class PanelCoordinacion implements OnInit {
   );
 
   protected readonly evidenciasValidas = computed(() =>
-    this.validados().reduce((suma, r) => suma + r.totalEvidencias, 0),
+    this.evidenciasValidadas().reduce((suma, d) => suma + d.veces, 0),
   );
 
   protected readonly porRevisar = computed(
@@ -64,10 +69,10 @@ export class PanelCoordinacion implements OnInit {
 
   protected readonly porHabito = computed<Barra[]>(() => {
     const conteo = new Map<string, number>();
-    for (const registro of this.validados()) {
-      for (const detalle of registro.detalles) {
-        conteo.set(detalle.nombreHabito, (conteo.get(detalle.nombreHabito) ?? 0) + detalle.veces);
-      }
+    const nombres = this.nombresHabito();
+    for (const detalle of this.evidenciasValidadas()) {
+      const nombre = nombres.get(detalle.habitoId) ?? detalle.nombreHabito;
+      conteo.set(nombre, (conteo.get(nombre) ?? 0) + detalle.veces);
     }
     return this.aBarras([...conteo].sort((a, b) => b[1] - a[1]));
   });
@@ -92,6 +97,9 @@ export class PanelCoordinacion implements OnInit {
     this.campaniaService.obtenerActiva().subscribe({
       next: (data) => this.campania.set(data),
       error: () => this.campania.set(null),
+    });
+    this.habitoService.listar().subscribe({
+      next: (data) => this.nombresHabito.set(new Map(data.map((h) => [h.id, h.nombre]))),
     });
     this.registroService.buscar().subscribe({
       next: (data) => this.registros.set(data),

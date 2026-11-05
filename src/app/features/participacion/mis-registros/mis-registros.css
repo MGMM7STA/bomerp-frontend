@@ -57,9 +57,65 @@
   font-size: 0.88rem;
 }
 
-.nombre {
+.detalle-texto {
   flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.nombre {
   color: var(--ss-ink);
+}
+
+.motivo-detalle {
+  font-size: 0.78rem;
+  color: var(--ss-red-ink);
+}
+
+app-foto-evidencia {
+  --tamanio: 42px;
+}
+
+.de {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--ss-muted);
+}
+
+.marca-estado {
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 50%;
+}
+
+.marca-estado .material-symbols-outlined {
+  font-size: 1.05rem;
+}
+
+.marca-VALIDADO {
+  background: var(--ss-lime-soft);
+  color: var(--ss-lime-ink);
+}
+
+.marca-RECHAZADO {
+  background: var(--ss-red-soft);
+  color: var(--ss-red-ink);
+}
+
+.marca-ENVIADO {
+  background: var(--ss-orange-soft);
+  color: var(--ss-orange-ink);
+}
+
+.marca-ANULADO,
+.marca-BORRADOR {
+  background: #eef1f4;
+  color: var(--ss-muted);
 }
 
 .veces {

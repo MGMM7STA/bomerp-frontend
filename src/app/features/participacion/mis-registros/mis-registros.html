@@ -50,7 +50,14 @@
           <header>
             <div>
               <span class="fecha">{{ registro.fecha | date: "EEEE d 'de' MMMM, HH:mm" }}</span>
-              <strong class="puntaje">{{ registro.puntajeTotal | number: '1.0-2' }} pts</strong>
+              <strong class="puntaje">
+                @if (registro.estado === 'VALIDADO' && registro.puntajeValidado !== registro.puntajeTotal) {
+                  {{ registro.puntajeValidado | number: '1.0-2' }}
+                  <span class="de">de {{ registro.puntajeTotal | number: '1.0-2' }}</span> pts
+                } @else {
+                  {{ registro.puntajeTotal | number: '1.0-2' }} pts
+                }
+              </strong>
             </div>
             <span class="ss-badge" [class]="estilo(registro.estado).clase">
               <span class="material-symbols-outlined">{{ estilo(registro.estado).icono }}</span>
@@ -59,14 +66,25 @@
           </header>
 
           <ul class="detalles">
-            @for (detalle of registro.detalles; track detalle.habitoId) {
+            @for (detalle of registro.detalles; track detalle.id) {
               <li>
-                <span class="nombre">{{ detalle.nombreHabito }}</span>
-                <span class="veces">×{{ detalle.veces }}</span>
-                @if (detalle.urlImagen) {
+                @if (detalle.tieneFoto) {
+                  <app-foto-evidencia [registroId]="registro.id" [detalleId]="detalle.id" />
+                } @else if (detalle.urlImagen) {
                   <a [href]="detalle.urlImagen" target="_blank" rel="noopener" class="foto" aria-label="Ver foto">
-                    <span class="material-symbols-outlined">image</span>
+                    <span class="material-symbols-outlined">link</span>
                   </a>
+                }
+                <div class="detalle-texto">
+                  <span class="nombre">{{ detalle.nombreHabito }} <span class="veces">×{{ detalle.veces }}</span></span>
+                  @if (detalle.estado === 'RECHAZADO' && detalle.motivoRechazo && registro.estado !== 'RECHAZADO') {
+                    <span class="motivo-detalle">{{ detalle.motivoRechazo }}</span>
+                  }
+                </div>
+                @if (registro.estado !== 'ENVIADO' || detalle.estado !== 'ENVIADO') {
+                  <span class="marca-estado" [class]="'marca-' + detalle.estado" [title]="estilo(detalle.estado).texto">
+                    <span class="material-symbols-outlined">{{ estilo(detalle.estado).icono }}</span>
+                  </span>
                 }
               </li>
             }

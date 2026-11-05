@@ -4,11 +4,9 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CategoriaHabitoService } from './categoria-habito-service';
 import { MensajeError } from '../../../shared/mensaje-error/mensaje-error';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
 @Component({
   selector: 'app-categoria-habito-form',
-  imports: [ReactiveFormsModule, MensajeError, MatFormFieldModule, MatInputModule],
+  imports: [ReactiveFormsModule, MensajeError],
   templateUrl: './categoria-habito-form.html',
 })
 export class CategoriaHabitoForm implements OnInit {

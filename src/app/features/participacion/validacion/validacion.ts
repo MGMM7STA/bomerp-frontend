@@ -1,10 +1,17 @@
-import { DatePipe, DecimalPipe } from '@angular/common';
+import { DatePipe, DecimalPipe, NgTemplateOutlet } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { RegistroService } from '../registro/registro-service';
-import { RegistroResponse } from '../registro/registro.model';
+import { DetalleEvidenciaResponse, RegistroResponse } from '../registro/registro.model';
 import { EstudianteService } from '../estudiante/estudiante-service';
 import { Estudiante } from '../estudiante/estudiante.model';
 import { mensajeDeError } from '../../../shared/utilidades/errores';
+import { estiloEstado } from '../../../shared/utilidades/estados';
+import { FotoEvidencia } from '../../../shared/foto-evidencia/foto-evidencia';
+
+interface Rechazo {
+  registroId: number;
+  detalleId: number | null;
+}
 
 interface Aviso {
   tipo: 'ok' | 'error';
@@ -13,7 +20,7 @@ interface Aviso {
 
 @Component({
   selector: 'app-validacion',
-  imports: [DatePipe, DecimalPipe],
+  imports: [DatePipe, DecimalPipe, NgTemplateOutlet, FotoEvidencia],
   templateUrl: './validacion.html',
   styleUrl: './validacion.css',
 })
@@ -25,17 +32,21 @@ export class Validacion implements OnInit {
   protected readonly estudiantes = signal<Map<number, Estudiante>>(new Map());
   protected readonly cargando = signal(true);
   protected readonly ocupado = signal<number | null>(null);
-  protected readonly rechazando = signal<number | null>(null);
+  protected readonly rechazando = signal<Rechazo | null>(null);
+  protected readonly estilo = estiloEstado;
   protected readonly motivo = signal('');
   protected readonly aviso = signal<Aviso | null>(null);
   protected readonly revisadosHoy = signal(0);
 
-  protected readonly evidencias = computed(() =>
-    this.pendientes().reduce((suma, r) => suma + r.totalEvidencias, 0),
+  protected readonly evidencias = computed(
+    () => this.pendientes().flatMap((r) => r.detalles).filter((d) => d.estado === 'ENVIADO').length,
   );
 
   protected readonly conFoto = computed(
-    () => this.pendientes().filter((r) => r.detalles.some((d) => !!d.urlImagen)).length,
+    () =>
+      this.pendientes()
+        .flatMap((r) => r.detalles)
+        .filter((d) => d.estado === 'ENVIADO' && (d.tieneFoto || !!d.urlImagen)).length,
   );
 
   ngOnInit(): void {
@@ -76,16 +87,33 @@ export class Validacion implements OnInit {
       .join('');
   }
 
-  protected validar(registro: RegistroResponse): void {
+  protected pendientesDe(registro: RegistroResponse): number {
+    return registro.detalles.filter((d) => d.estado === 'ENVIADO').length;
+  }
+
+  protected rechazandoEste(registro: RegistroResponse, detalle: DetalleEvidenciaResponse | null): boolean {
+    const actual = this.rechazando();
+    return actual?.registroId === registro.id && actual.detalleId === (detalle?.id ?? null);
+  }
+
+  protected validarTodo(registro: RegistroResponse): void {
     this.ocupado.set(registro.id);
     this.registroService.validar(registro.id).subscribe({
-      next: () => this.terminar(registro, `Validaste el registro de ${this.nombre(registro)}.`),
+      next: (r) => this.actualizar(r, `Validaste todo lo pendiente de ${this.nombre(registro)}.`),
       error: (err) => this.fallar(err),
     });
   }
 
-  protected abrirRechazo(registro: RegistroResponse): void {
-    this.rechazando.set(registro.id);
+  protected validarDetalle(registro: RegistroResponse, detalle: DetalleEvidenciaResponse): void {
+    this.ocupado.set(registro.id);
+    this.registroService.validarDetalle(registro.id, detalle.id).subscribe({
+      next: (r) => this.actualizar(r, `Validaste "${detalle.nombreHabito}" de ${this.nombre(registro)}.`),
+      error: (err) => this.fallar(err),
+    });
+  }
+
+  protected abrirRechazo(registro: RegistroResponse, detalle: DetalleEvidenciaResponse | null): void {
+    this.rechazando.set({ registroId: registro.id, detalleId: detalle?.id ?? null });
     this.motivo.set('');
   }
 
@@ -98,22 +126,36 @@ export class Validacion implements OnInit {
     this.motivo.set((evento.target as HTMLTextAreaElement).value);
   }
 
-  protected rechazar(registro: RegistroResponse): void {
+  protected confirmarRechazo(registro: RegistroResponse): void {
     const motivo = this.motivo().trim();
-    if (motivo.length < 5) return;
+    const actual = this.rechazando();
+    if (motivo.length < 5 || !actual) return;
     this.ocupado.set(registro.id);
-    this.registroService.rechazar(registro.id, motivo).subscribe({
-      next: () => {
+    const detalle = registro.detalles.find((d) => d.id === actual.detalleId);
+    const peticion = detalle
+      ? this.registroService.rechazarDetalle(registro.id, detalle.id, motivo)
+      : this.registroService.rechazar(registro.id, motivo);
+    peticion.subscribe({
+      next: (r) => {
         this.rechazando.set(null);
-        this.terminar(registro, `Rechazaste el registro de ${this.nombre(registro)}. Su cupo del día quedó libre.`);
+        this.actualizar(
+          r,
+          detalle
+            ? `Rechazaste "${detalle.nombreHabito}" de ${this.nombre(registro)}. Su cupo quedó libre.`
+            : `Rechazaste lo pendiente de ${this.nombre(registro)}. Su cupo quedó libre.`,
+        );
       },
       error: (err) => this.fallar(err),
     });
   }
 
-  private terminar(registro: RegistroResponse, texto: string): void {
-    this.pendientes.update((lista) => lista.filter((r) => r.id !== registro.id));
-    this.revisadosHoy.update((n) => n + 1);
+  private actualizar(actualizado: RegistroResponse, texto: string): void {
+    if (actualizado.estado === 'ENVIADO') {
+      this.pendientes.update((lista) => lista.map((r) => (r.id === actualizado.id ? actualizado : r)));
+    } else {
+      this.pendientes.update((lista) => lista.filter((r) => r.id !== actualizado.id));
+      this.revisadosHoy.update((n) => n + 1);
+    }
     this.ocupado.set(null);
     this.aviso.set({ tipo: 'ok', texto });
   }

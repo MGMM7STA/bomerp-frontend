@@ -76,6 +76,11 @@ export const routes: Routes = [
           import('./features/campanias/campania/campania-form').then((m) => m.CampaniaForm),
       },
       {
+        path: 'cuentas',
+        canActivate: [authGuard, rolGuard('ADMIN')],
+        loadComponent: () => import('./features/cuentas/cuentas').then((m) => m.Cuentas),
+      },
+      {
         path: 'participacion/registrar',
         canActivate: [authGuard, rolGuard('ESTUDIANTE')],
         loadComponent: () =>

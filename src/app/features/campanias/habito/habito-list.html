@@ -18,15 +18,18 @@
   <div class="ss-tarjeta">
     <div class="ss-filtros">
       <h2 class="ss-tarjeta-titulo">{{ habitos().length }} hábitos</h2>
-      <mat-form-field subscriptSizing="dynamic">
-        <mat-label>Filtrar por categoría</mat-label>
-        <mat-select [value]="0" (selectionChange)="filtrar($event.value)">
-          <mat-option [value]="0">Todas</mat-option>
-          @for (categoria of categorias(); track categoria.id) {
-            <mat-option [value]="categoria.id">{{ categoria.nombre }}</mat-option>
-          }
-        </mat-select>
-      </mat-form-field>
+      <div class="ss-chips" role="group" aria-label="Filtrar por categoría">
+        <button type="button" class="ss-chip" [class.activo]="categoriaFiltro() === null" (click)="filtrar(0)">Todas</button>
+        @for (categoria of categorias(); track categoria.id) {
+          <button
+            type="button"
+            class="ss-chip"
+            [class.activo]="categoriaFiltro() === categoria.id"
+            (click)="filtrar(categoria.id!)">
+            {{ categoria.nombre }}
+          </button>
+        }
+      </div>
     </div>
 
     <table class="ss-tabla ss-tabla-apilable">

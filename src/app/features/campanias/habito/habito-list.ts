@@ -1,8 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatSelectModule } from '@angular/material/select';
 import { CategoriaHabitoService } from '../categoria-habito/categoria-habito-service';
 import { CategoriaHabito } from '../categoria-habito/categoria-habito.model';
 import { HabitoService } from './habito-service';
@@ -13,7 +11,7 @@ import { ConfirmacionService } from '../../../shared/confirmacion/confirmacion';
 
 @Component({
   selector: 'app-habito-list',
-  imports: [RouterLink, MensajeError, MatFormFieldModule, MatSelectModule],
+  imports: [RouterLink, MensajeError],
   templateUrl: './habito-list.html',
 })
 export class HabitoList implements OnInit {

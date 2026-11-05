@@ -87,17 +87,12 @@
         }
       </header>
 
-      @if (registro.estado === 'RECHAZADO' && registro.motivoRechazo) {
-        <div class="ss-aviso ss-aviso-error">
-          <span class="material-symbols-outlined">feedback</span>
-          <span><strong>Motivo:</strong> {{ registro.motivoRechazo }}</span>
-        </div>
-      }
 
       <table class="ss-tabla">
         <thead>
           <tr>
             <th>Hábito</th>
+            <th>Estado</th>
             <th>Descripción</th>
             <th class="num">Puntaje</th>
             <th class="num">Veces</th>
@@ -108,7 +103,13 @@
           @for (detalle of registro.detalles; track $index) {
             <tr>
               <td>{{ detalle.nombreHabito }}</td>
-              <td>{{ detalle.descripcion || '—' }}</td>
+              <td><span class="ss-badge" [class]="estilo(detalle.estado).clase">{{ estilo(detalle.estado).texto }}</span></td>
+              <td>
+                {{ detalle.descripcion || '—' }}
+                @if (detalle.motivoRechazo) {
+                  <div class="motivo">Motivo: {{ detalle.motivoRechazo }}</div>
+                }
+              </td>
               <td class="num">{{ detalle.puntajeUnitario | number: '1.2-2' }} pts</td>
               <td class="num">{{ detalle.veces }}</td>
               <td class="num">{{ detalle.subtotal | number: '1.2-2' }} pts</td>
@@ -117,9 +118,14 @@
         </tbody>
         <tfoot>
           <tr>
-            <td colspan="3">Total del registro</td>
+            <td colspan="4">Total del registro</td>
             <td class="num">{{ registro.totalEvidencias }}</td>
-            <td class="num">{{ registro.puntajeTotal | number: '1.2-2' }} pts</td>
+            <td class="num">
+              {{ registro.puntajeTotal | number: '1.2-2' }} pts
+              @if (registro.estado === 'VALIDADO' && registro.puntajeValidado !== registro.puntajeTotal) {
+                <div class="validado">{{ registro.puntajeValidado | number: '1.2-2' }} validados</div>
+              }
+            </td>
           </tr>
         </tfoot>
       </table>

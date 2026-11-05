@@ -170,19 +170,41 @@
                     maxlength="250"
                     placeholder="Cuéntalo en una línea"
                     [value]="linea.descripcion"
-                    (input)="escribir(i, 'descripcion', $event)"></textarea>
+                    (input)="escribir(i, $event)"></textarea>
                 </div>
 
                 <div class="ss-campo crece">
-                  <label [attr.for]="'foto-' + i">Enlace de la foto</label>
+                  <label [attr.for]="'foto-' + i">Foto de la evidencia</label>
                   <input
-                    class="ss-input"
+                    class="archivo-oculto"
                     [id]="'foto-' + i"
-                    type="url"
-                    placeholder="https://..."
-                    [value]="linea.urlImagen"
-                    (input)="escribir(i, 'urlImagen', $event)" />
-                  <small>Opcional. Ayuda a que coordinación valide más rápido.</small>
+                    type="file"
+                    accept="image/*"
+                    (change)="elegirFoto(i, $event)" />
+                  @if (linea.vista) {
+                    <div class="foto-elegida">
+                      <img [src]="linea.vista" alt="Vista previa de la foto" />
+                      <div class="foto-acciones">
+                        <label class="ss-btn ss-btn-secundario ss-btn-chico" [attr.for]="'foto-' + i">
+                          <span class="material-symbols-outlined">sync</span>
+                          Cambiar
+                        </label>
+                        <button type="button" class="ss-btn ss-btn-peligro ss-btn-chico" (click)="quitarFoto(i)">
+                          <span class="material-symbols-outlined">delete</span>
+                          Quitar
+                        </button>
+                      </div>
+                    </div>
+                  } @else {
+                    <label class="zona-foto" [attr.for]="'foto-' + i" [class.cargando]="procesando() === i">
+                      <span class="material-symbols-outlined">{{ procesando() === i ? 'hourglass_top' : 'add_a_photo' }}</span>
+                      <span>
+                        <strong>{{ procesando() === i ? 'Preparando foto...' : 'Subir foto' }}</strong>
+                        <small>Desde tu galería o la cámara</small>
+                      </span>
+                    </label>
+                  }
+                  <small>Opcional, pero con foto coordinación valida más rápido.</small>
                 </div>
               </div>
             </article>
@@ -201,6 +223,13 @@
           <ul class="resumen">
             @for (linea of lineas(); track linea.habito.id) {
               <li>
+                @if (linea.vista) {
+                  <img class="resumen-foto" [src]="linea.vista" alt="" />
+                } @else {
+                  <span class="resumen-foto sin">
+                    <span class="material-symbols-outlined">hide_image</span>
+                  </span>
+                }
                 <div>
                   <strong>{{ linea.habito.nombre }}</strong>
                   <small>{{ linea.descripcion || 'Sin descripción' }}</small>

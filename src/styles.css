@@ -541,3 +541,45 @@ textarea.ss-input {
     text-align: center;
   }
 }
+
+.ss-dialogo-foto {
+  --mat-dialog-container-color: #0d1b2a;
+  --mat-dialog-container-shape: 14px;
+  --mat-dialog-container-max-width: 96vw;
+}
+
+select.ss-input,
+.form-field select,
+.filter-row select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 2.4rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23003866' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1.1rem;
+  cursor: pointer;
+}
+
+select.ss-input:hover,
+.form-field select:hover,
+.filter-row select:hover {
+  border-color: #9fb3c8;
+}
+
+input.ss-input::placeholder,
+textarea.ss-input::placeholder {
+  color: #9aa6b3;
+}
+
+.ss-form-fila {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 0.9rem;
+}
+
+@media (max-width: 480px) {
+  .ss-form-fila {
+    grid-template-columns: 1fr;
+  }
+}

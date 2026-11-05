@@ -3,7 +3,7 @@
     <div>
       <span class="ss-eyebrow">Seguimiento</span>
       <h1 class="ss-titulo">Validar evidencias</h1>
-      <p class="ss-descripcion">Los registros llegan en orden: el más antiguo primero.</p>
+      <p class="ss-descripcion">Revisa cada evidencia por separado. Los registros más antiguos salen primero.</p>
     </div>
     <button type="button" class="ss-btn ss-btn-secundario" (click)="cargar()" [disabled]="cargando()">
       <span class="material-symbols-outlined">refresh</span>
@@ -25,7 +25,7 @@
     </div>
     <div class="ss-stat">
       <span class="ss-stat-valor">{{ evidencias() }}</span>
-      <span class="ss-stat-nombre">Evidencias</span>
+      <span class="ss-stat-nombre">Evidencias pendientes</span>
     </div>
     <div class="ss-stat">
       <span class="ss-stat-valor">{{ conFoto() }}</span>
@@ -55,65 +55,78 @@
         </header>
 
         <ul class="evidencias">
-          @for (detalle of registro.detalles; track detalle.habitoId) {
-            <li>
-              <div class="evidencia-texto">
-                <span class="habito">{{ detalle.nombreHabito }} <span class="veces">×{{ detalle.veces }}</span></span>
-                <span class="descripcion">{{ detalle.descripcion || 'Sin descripción' }}</span>
+          @for (detalle of registro.detalles; track detalle.id) {
+            <li [class.revisada]="detalle.estado !== 'ENVIADO'">
+              <div class="evidencia-fila">
+                @if (detalle.tieneFoto) {
+                  <app-foto-evidencia [registroId]="registro.id" [detalleId]="detalle.id" />
+                } @else if (detalle.urlImagen) {
+                  <a class="sin-foto enlace" [href]="detalle.urlImagen" target="_blank" rel="noopener" aria-label="Abrir enlace de la foto">
+                    <span class="material-symbols-outlined">link</span>
+                  </a>
+                } @else {
+                  <span class="sin-foto" title="Sin foto">
+                    <span class="material-symbols-outlined">hide_image</span>
+                  </span>
+                }
+                <div class="evidencia-texto">
+                  <span class="habito">{{ detalle.nombreHabito }} <span class="veces">×{{ detalle.veces }}</span></span>
+                  <span class="descripcion">{{ detalle.descripcion || 'Sin descripción' }}</span>
+                  @if (detalle.estado === 'RECHAZADO' && detalle.motivoRechazo) {
+                    <span class="motivo">Motivo: {{ detalle.motivoRechazo }}</span>
+                  }
+                </div>
+                @if (detalle.estado === 'ENVIADO') {
+                  <div class="acciones-evidencia">
+                    <button
+                      type="button"
+                      class="icono-accion rechazar"
+                      (click)="abrirRechazo(registro, detalle)"
+                      [disabled]="ocupado() !== null"
+                      aria-label="Rechazar esta evidencia"
+                      title="Rechazar">
+                      <span class="material-symbols-outlined">close</span>
+                    </button>
+                    <button
+                      type="button"
+                      class="icono-accion validar"
+                      (click)="validarDetalle(registro, detalle)"
+                      [disabled]="ocupado() !== null"
+                      aria-label="Validar esta evidencia"
+                      title="Validar">
+                      <span class="material-symbols-outlined">check</span>
+                    </button>
+                  </div>
+                } @else {
+                  <span class="ss-badge" [class]="estilo(detalle.estado).clase">{{ estilo(detalle.estado).texto }}</span>
+                }
               </div>
-              @if (detalle.urlImagen) {
-                <a class="ss-btn ss-btn-secundario ss-btn-chico" [href]="detalle.urlImagen" target="_blank" rel="noopener">
-                  <span class="material-symbols-outlined">image</span>
-                  Ver foto
-                </a>
-              } @else {
-                <span class="sin-foto">Sin foto</span>
+              @if (rechazandoEste(registro, detalle)) {
+                <ng-container *ngTemplateOutlet="formRechazo; context: { $implicit: registro, texto: 'Rechazar esta evidencia' }" />
               }
             </li>
           }
         </ul>
 
-        @if (rechazando() === registro.id) {
-          <div class="rechazo">
-            <label class="ss-stat-nombre" [attr.for]="'motivo-' + registro.id">Motivo del rechazo</label>
-            <textarea
-              class="ss-input"
-              [id]="'motivo-' + registro.id"
-              rows="2"
-              maxlength="250"
-              placeholder="Ej. La foto no muestra la actividad"
-              [value]="motivo()"
-              (input)="escribirMotivo($event)"></textarea>
-            <small>El estudiante verá este mensaje. Mínimo 5 caracteres.</small>
-            <div class="ss-acciones">
-              <button type="button" class="ss-btn ss-btn-secundario" (click)="cancelarRechazo()">Cancelar</button>
-              <button
-                type="button"
-                class="ss-btn ss-btn-peligro-lleno"
-                (click)="rechazar(registro)"
-                [disabled]="motivo().trim().length < 5 || ocupado() === registro.id">
-                <span class="material-symbols-outlined">block</span>
-                Confirmar rechazo
-              </button>
-            </div>
-          </div>
-        } @else {
+        @if (rechazandoEste(registro, null)) {
+          <ng-container *ngTemplateOutlet="formRechazo; context: { $implicit: registro, texto: 'Rechazar todo lo pendiente' }" />
+        } @else if (pendientesDe(registro) > 1) {
           <footer class="ss-acciones">
             <button
               type="button"
               class="ss-btn ss-btn-peligro"
-              (click)="abrirRechazo(registro)"
+              (click)="abrirRechazo(registro, null)"
               [disabled]="ocupado() !== null">
               <span class="material-symbols-outlined">close</span>
-              Rechazar
+              Rechazar todo
             </button>
             <button
               type="button"
               class="ss-btn ss-btn-exito"
-              (click)="validar(registro)"
+              (click)="validarTodo(registro)"
               [disabled]="ocupado() !== null">
-              <span class="material-symbols-outlined">check</span>
-              Validar
+              <span class="material-symbols-outlined">done_all</span>
+              Validar todo
             </button>
           </footer>
         }
@@ -127,3 +140,29 @@
     }
   }
 </section>
+
+<ng-template #formRechazo let-registro let-texto="texto">
+  <div class="rechazo">
+    <label class="ss-stat-nombre" [attr.for]="'motivo-' + registro.id">{{ texto }}</label>
+    <textarea
+      class="ss-input"
+      [id]="'motivo-' + registro.id"
+      rows="2"
+      maxlength="250"
+      placeholder="Ej. La foto no muestra la actividad"
+      [value]="motivo()"
+      (input)="escribirMotivo($event)"></textarea>
+    <small>El estudiante verá este mensaje. Mínimo 5 caracteres.</small>
+    <div class="ss-acciones">
+      <button type="button" class="ss-btn ss-btn-secundario" (click)="cancelarRechazo()">Cancelar</button>
+      <button
+        type="button"
+        class="ss-btn ss-btn-peligro-lleno"
+        (click)="confirmarRechazo(registro)"
+        [disabled]="motivo().trim().length < 5 || ocupado() === registro.id">
+        <span class="material-symbols-outlined">block</span>
+        Confirmar rechazo
+      </button>
+    </div>
+  </div>
+</ng-template>

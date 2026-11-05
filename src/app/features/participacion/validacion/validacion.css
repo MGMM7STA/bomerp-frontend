@@ -66,13 +66,21 @@
 }
 
 .evidencias li {
+  padding: 0.65rem 0.75rem;
+  border-radius: 12px;
+  background: #f8fafc;
+  margin-bottom: 0.45rem;
+}
+
+.evidencias li.revisada {
+  background: #fff;
+  border: 1px solid var(--ss-line);
+}
+
+.evidencia-fila {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.65rem 0.75rem;
-  border-radius: 10px;
-  background: #f8fafc;
-  margin-bottom: 0.4rem;
+  gap: 0.8rem;
 }
 
 .evidencia-texto {
@@ -98,9 +106,71 @@
   color: var(--ss-text);
 }
 
+.motivo {
+  font-size: 0.8rem;
+  color: var(--ss-red-ink);
+}
+
 .sin-foto {
-  font-size: 0.78rem;
-  color: var(--ss-muted);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 64px;
+  height: 64px;
+  border-radius: 10px;
+  background: #eef1f4;
+  color: #9aa6b3;
+}
+
+.sin-foto.enlace {
+  color: var(--ss-navy);
+  background: var(--ss-navy-soft);
+  text-decoration: none;
+}
+
+.acciones-evidencia {
+  display: flex;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
+.icono-accion {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.icono-accion:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.icono-accion.validar {
+  background: var(--ss-lime);
+  color: var(--ss-navy-700);
+}
+
+.icono-accion.validar:hover:not(:disabled) {
+  background: #a3bc1c;
+}
+
+.icono-accion.rechazar {
+  background: #fff;
+  border-color: #f2c4c4;
+  color: var(--ss-red);
+}
+
+.icono-accion.rechazar:hover:not(:disabled) {
+  background: var(--ss-red-soft);
+}
+
+.evidencias .rechazo {
+  margin-top: 0.65rem;
 }
 
 .pendiente footer {
@@ -158,8 +228,14 @@
 }
 
 @media (max-width: 640px) {
-  .evidencias li {
-    flex-wrap: wrap;
+  .sin-foto,
+  app-foto-evidencia {
+    --tamanio: 52px;
+  }
+
+  .sin-foto {
+    width: 52px;
+    height: 52px;
   }
 
   .pendiente footer .ss-btn,

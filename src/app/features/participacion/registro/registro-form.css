@@ -402,3 +402,98 @@
     flex: 1;
   }
 }
+
+.archivo-oculto {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.zona-foto {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.8rem 0.9rem;
+  border: 1.5px dashed #b8c4d0;
+  border-radius: 12px;
+  background: #f8fafc;
+  color: var(--ss-navy);
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.zona-foto:hover {
+  border-color: var(--ss-navy);
+  background: #f2f6fa;
+}
+
+.zona-foto > .material-symbols-outlined {
+  display: inline-grid;
+  place-items: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 10px;
+  background: var(--ss-navy-soft);
+  font-size: 1.3rem;
+}
+
+.zona-foto strong {
+  display: block;
+  font-size: 0.88rem;
+}
+
+.zona-foto small {
+  font-size: 0.78rem;
+  color: var(--ss-muted);
+}
+
+.zona-foto.cargando {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.archivo-oculto:focus-visible + .zona-foto {
+  outline: 2px solid rgba(178, 204, 35, 0.7);
+  outline-offset: 2px;
+}
+
+.foto-elegida {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.foto-elegida img {
+  width: 76px;
+  height: 76px;
+  border-radius: 10px;
+  object-fit: cover;
+  border: 1px solid var(--ss-line);
+}
+
+.foto-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.foto-acciones label {
+  cursor: pointer;
+}
+
+.resumen-foto {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.resumen-foto.sin {
+  display: inline-grid;
+  place-items: center;
+  background: #eef1f4;
+  color: #9aa6b3;
+}

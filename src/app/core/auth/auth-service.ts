@@ -42,7 +42,11 @@ export class AuthService {
     if (!token) return null;
     const payload = decodeJwtPayload(token);
     if (!payload) return null;
-    return { nombre: payload.name ?? payload.preferred_username ?? 'Usuario', email: payload.email ?? '' };
+    return {
+      id: payload.sub,
+      nombre: payload.name ?? payload.preferred_username ?? 'Usuario',
+      email: payload.email ?? '',
+    };
   });
 
   tieneRol(...rolesPermitidos: string[]): boolean {

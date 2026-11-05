@@ -1,0 +1,338 @@
+<section class="ss-pagina">
+  <header class="ss-cabecera">
+    <div>
+      <span class="ss-eyebrow">Configuración</span>
+      <h1 class="ss-titulo">Cuentas</h1>
+      <p class="ss-descripcion">Solo el administrador crea cuentas. Cada una entra con una contraseña temporal que se cambia al primer ingreso.</p>
+    </div>
+    <button type="button" class="ss-btn ss-btn-primario" (click)="abrirCrear()">
+      <span class="material-symbols-outlined">person_add</span>
+      Nueva cuenta
+    </button>
+  </header>
+
+  @if (error()) {
+    <div class="ss-aviso ss-aviso-error">
+      <span class="material-symbols-outlined">error</span>
+      <span>{{ error() }}</span>
+    </div>
+  }
+  @if (aviso()) {
+    <div class="ss-aviso ss-aviso-ok">
+      <span class="material-symbols-outlined">check_circle</span>
+      <span>{{ aviso() }}</span>
+    </div>
+  }
+
+  <div class="ss-stats">
+    <div class="ss-stat">
+      <span class="ss-stat-valor">{{ conteo().total }}</span>
+      <span class="ss-stat-nombre">Cuentas</span>
+    </div>
+    <div class="ss-stat">
+      <span class="ss-stat-valor">{{ conteo().ESTUDIANTE }}</span>
+      <span class="ss-stat-nombre">Estudiantes</span>
+    </div>
+    <div class="ss-stat">
+      <span class="ss-stat-valor">{{ conteo().COORDINADOR }}</span>
+      <span class="ss-stat-nombre">Coordinación</span>
+    </div>
+    <div class="ss-stat">
+      <span class="ss-stat-valor">{{ conteo().inactivas }}</span>
+      <span class="ss-stat-nombre">Desactivadas</span>
+    </div>
+  </div>
+
+  <div class="ss-tarjeta">
+    <div class="barra">
+      <label class="buscador">
+        <span class="material-symbols-outlined">search</span>
+        <input type="search" placeholder="Buscar por nombre, usuario o correo" (input)="buscar($event)" />
+      </label>
+      <div class="ss-chips">
+        <button type="button" class="ss-chip" [class.activo]="filtroRol() === null" (click)="filtroRol.set(null)">Todos</button>
+        @for (r of roles; track r.valor) {
+          <button type="button" class="ss-chip" [class.activo]="filtroRol() === r.valor" (click)="filtroRol.set(r.valor)">
+            {{ r.texto }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <table class="ss-tabla ss-tabla-apilable">
+      <thead>
+        <tr>
+          <th>Persona</th>
+          <th>Usuario</th>
+          <th>Rol</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (cuenta of visibles(); track cuenta.id) {
+          <tr [class.inactiva]="!cuenta.activa">
+            <td data-etiqueta="Persona">
+              <div class="persona">
+                <span class="avatar" [class]="'avatar-' + (cuenta.rol ?? 'NINGUNO')">{{ iniciales(cuenta) }}</span>
+                <div>
+                  <strong>
+                    {{ cuenta.nombres }} {{ cuenta.apellidos }}
+                    @if (cuenta.id === miId()) {
+                      <span class="tu">Tú</span>
+                    }
+                  </strong>
+                  <small>{{ cuenta.correo }}</small>
+                </div>
+              </div>
+            </td>
+            <td data-etiqueta="Usuario"><code>{{ cuenta.usuario }}</code></td>
+            <td data-etiqueta="Rol">
+              @if (opcion(cuenta.rol); as o) {
+                <span class="rol">
+                  <span class="material-symbols-outlined">{{ o.icono }}</span>
+                  {{ o.texto }}
+                </span>
+              } @else {
+                <span class="ss-badge ss-badge-gris">Sin rol</span>
+              }
+            </td>
+            <td data-etiqueta="Estado">
+              @if (cuenta.activa) {
+                <span class="ss-badge ss-badge-ok">Activa</span>
+              } @else {
+                <span class="ss-badge ss-badge-rechazado">Desactivada</span>
+              }
+            </td>
+            <td data-etiqueta="Acciones">
+              <div class="ss-acciones">
+                <button type="button" class="ss-btn ss-btn-secundario ss-btn-chico" (click)="abrirRol(cuenta)">
+                  <span class="material-symbols-outlined">badge</span>
+                  Rol
+                </button>
+                <button type="button" class="ss-btn ss-btn-secundario ss-btn-chico" (click)="abrirClave(cuenta)">
+                  <span class="material-symbols-outlined">key</span>
+                  Contraseña
+                </button>
+                @if (cuenta.activa) {
+                  <button
+                    type="button"
+                    class="ss-btn ss-btn-peligro ss-btn-chico"
+                    (click)="alternarEstado(cuenta)"
+                    [disabled]="cuenta.id === miId()"
+                    [title]="cuenta.id === miId() ? 'No puedes desactivar tu propia cuenta' : ''">
+                    <span class="material-symbols-outlined">block</span>
+                    Desactivar
+                  </button>
+                } @else {
+                  <button type="button" class="ss-btn ss-btn-exito ss-btn-chico" (click)="alternarEstado(cuenta)">
+                    <span class="material-symbols-outlined">lock_open</span>
+                    Activar
+                  </button>
+                }
+              </div>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="5" class="ss-vacio">
+              {{ cargando() ? 'Cargando cuentas...' : 'No hay cuentas que coincidan con la búsqueda.' }}
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</section>
+
+@if (panel(); as p) {
+  <div class="velo" (click)="p.tipo === 'entregar' ? null : cerrar()"></div>
+  <div class="modal" role="dialog" aria-modal="true">
+    @switch (p.tipo) {
+      @case ('crear') {
+        <header class="modal-cabecera">
+          <h2>Nueva cuenta</h2>
+          <button type="button" class="cerrar" (click)="cerrar()" aria-label="Cerrar">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </header>
+        <form [formGroup]="form" (ngSubmit)="crear()" class="modal-cuerpo">
+          @if (errorPanel()) {
+            <div class="ss-aviso ss-aviso-error">
+              <span class="material-symbols-outlined">error</span>
+              <span>{{ errorPanel() }}</span>
+            </div>
+          }
+          <div class="ss-form-fila">
+            <div class="ss-campo">
+              <label for="nombres">Nombres</label>
+              <input id="nombres" class="ss-input" formControlName="nombres" />
+              @if (invalido('nombres')) {
+                <span class="error">Escribe los nombres.</span>
+              }
+            </div>
+            <div class="ss-campo">
+              <label for="apellidos">Apellidos</label>
+              <input id="apellidos" class="ss-input" formControlName="apellidos" />
+              @if (invalido('apellidos')) {
+                <span class="error">Escribe los apellidos.</span>
+              }
+            </div>
+          </div>
+          <div class="ss-campo">
+            <label for="correo">Correo institucional</label>
+            <input id="correo" class="ss-input" type="email" formControlName="correo" placeholder="nombre.apellido@upeu.edu.pe" (blur)="sugerirUsuario()" />
+            @if (invalido('correo')) {
+              <span class="error">Escribe un correo válido.</span>
+            }
+          </div>
+          <div class="ss-form-fila">
+            <div class="ss-campo">
+              <label for="usuario">Usuario</label>
+              <input id="usuario" class="ss-input" formControlName="usuario" autocomplete="off" />
+              @if (invalido('usuario')) {
+                <span class="error">Mínimo 3 caracteres: minúsculas, números, punto o guion.</span>
+              } @else {
+                <small>Con esto inicia sesión.</small>
+              }
+            </div>
+            <div class="ss-campo">
+              <label for="clave">Contraseña temporal</label>
+              <div class="con-boton">
+                <input id="clave" class="ss-input" formControlName="contrasenia" autocomplete="off" />
+                <button type="button" class="icono-boton" (click)="nuevaClaveFormulario()" aria-label="Generar otra" title="Generar otra">
+                  <span class="material-symbols-outlined">refresh</span>
+                </button>
+              </div>
+              @if (invalido('contrasenia')) {
+                <span class="error">Mínimo 8 caracteres.</span>
+              } @else {
+                <small>Se pedirá cambiarla al ingresar.</small>
+              }
+            </div>
+          </div>
+          <div class="ss-campo">
+            <label>Rol</label>
+            <div class="roles">
+              @for (r of roles; track r.valor) {
+                <button type="button" class="opcion-rol" [class.activo]="rolElegido() === r.valor" (click)="rolElegido.set(r.valor)">
+                  <span class="material-symbols-outlined">{{ r.icono }}</span>
+                  <strong>{{ r.texto }}</strong>
+                  <small>{{ r.ayuda }}</small>
+                </button>
+              }
+            </div>
+          </div>
+          <footer class="modal-pie">
+            <button type="button" class="ss-btn ss-btn-secundario" (click)="cerrar()">Cancelar</button>
+            <button type="submit" class="ss-btn ss-btn-primario" [disabled]="guardando()">
+              <span class="material-symbols-outlined">person_add</span>
+              {{ guardando() ? 'Creando...' : 'Crear cuenta' }}
+            </button>
+          </footer>
+        </form>
+      }
+      @case ('rol') {
+        <header class="modal-cabecera">
+          <h2>Rol de {{ p.cuenta.nombres }}</h2>
+          <button type="button" class="cerrar" (click)="cerrar()" aria-label="Cerrar">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </header>
+        <div class="modal-cuerpo">
+          @if (errorPanel()) {
+            <div class="ss-aviso ss-aviso-error">
+              <span class="material-symbols-outlined">error</span>
+              <span>{{ errorPanel() }}</span>
+            </div>
+          }
+          <div class="roles">
+            @for (r of roles; track r.valor) {
+              <button
+                type="button"
+                class="opcion-rol"
+                [class.activo]="rolElegido() === r.valor"
+                [disabled]="p.cuenta.id === miId() && r.valor !== 'ADMIN'"
+                (click)="rolElegido.set(r.valor)">
+                <span class="material-symbols-outlined">{{ r.icono }}</span>
+                <strong>{{ r.texto }}</strong>
+                <small>{{ r.ayuda }}</small>
+              </button>
+            }
+          </div>
+          @if (p.cuenta.id === miId()) {
+            <p class="nota">No puedes quitarte el rol de administrador a ti mismo.</p>
+          } @else {
+            <p class="nota">El cambio se aplica la próxima vez que la persona inicie sesión.</p>
+          }
+          <footer class="modal-pie">
+            <button type="button" class="ss-btn ss-btn-secundario" (click)="cerrar()">Cancelar</button>
+            <button type="button" class="ss-btn ss-btn-primario" (click)="guardarRol(p.cuenta)" [disabled]="guardando()">
+              <span class="material-symbols-outlined">save</span>
+              Guardar rol
+            </button>
+          </footer>
+        </div>
+      }
+      @case ('clave') {
+        <header class="modal-cabecera">
+          <h2>Restablecer contraseña</h2>
+          <button type="button" class="cerrar" (click)="cerrar()" aria-label="Cerrar">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </header>
+        <div class="modal-cuerpo">
+          <p class="nota">
+            {{ p.cuenta.nombres }} {{ p.cuenta.apellidos }} entrará con esta contraseña temporal y tendrá que cambiarla.
+          </p>
+          @if (errorPanel()) {
+            <div class="ss-aviso ss-aviso-error">
+              <span class="material-symbols-outlined">error</span>
+              <span>{{ errorPanel() }}</span>
+            </div>
+          }
+          <div class="ss-campo">
+            <label for="clave-nueva">Contraseña temporal</label>
+            <div class="con-boton">
+              <input id="clave-nueva" class="ss-input" [value]="claveNueva()" (input)="escribirClave($event)" autocomplete="off" />
+              <button type="button" class="icono-boton" (click)="regenerarClave()" aria-label="Generar otra" title="Generar otra">
+                <span class="material-symbols-outlined">refresh</span>
+              </button>
+            </div>
+          </div>
+          <footer class="modal-pie">
+            <button type="button" class="ss-btn ss-btn-secundario" (click)="cerrar()">Cancelar</button>
+            <button type="button" class="ss-btn ss-btn-primario" (click)="guardarClave(p.cuenta)" [disabled]="guardando()">
+              <span class="material-symbols-outlined">key</span>
+              Restablecer
+            </button>
+          </footer>
+        </div>
+      }
+      @case ('entregar') {
+        <div class="modal-cuerpo entrega">
+          <span class="icono-ok"><span class="material-symbols-outlined">how_to_reg</span></span>
+          <h2>{{ p.nueva ? 'Cuenta creada' : 'Contraseña restablecida' }}</h2>
+          <p class="nota">Pásale estos datos a {{ p.nombre }}. La contraseña no se vuelve a mostrar.</p>
+          <dl class="credenciales">
+            <div>
+              <dt>Usuario</dt>
+              <dd><code>{{ p.usuario }}</code></dd>
+            </div>
+            <div>
+              <dt>Contraseña temporal</dt>
+              <dd><code>{{ p.contrasenia }}</code></dd>
+            </div>
+          </dl>
+          <footer class="modal-pie">
+            <button type="button" class="ss-btn ss-btn-secundario" (click)="copiar(p)">
+              <span class="material-symbols-outlined">{{ copiado() ? 'check' : 'content_copy' }}</span>
+              {{ copiado() ? 'Copiado' : 'Copiar datos' }}
+            </button>
+            <button type="button" class="ss-btn ss-btn-primario" (click)="cerrar()">Listo</button>
+          </footer>
+        </div>
+      }
+    }
+  </div>
+}

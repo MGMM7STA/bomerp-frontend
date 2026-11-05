@@ -10,8 +10,13 @@ export class RegistroService {
   private readonly api = inject(ApiService);
   private readonly resource = '/api/v1/participacion/registros';
 
-  crear(registro: RegistroRequest): Observable<RegistroResponse> {
-    return this.http.post<RegistroResponse>(this.api.buildUrl(this.resource), registro);
+  crear(registro: RegistroRequest, fotos: (Blob | null)[] = []): Observable<RegistroResponse> {
+    const datos = new FormData();
+    datos.append('registro', new Blob([JSON.stringify(registro)], { type: 'application/json' }));
+    fotos.forEach((foto, indice) => {
+      if (foto) datos.append(`foto-${indice}`, foto, `foto-${indice}.jpg`);
+    });
+    return this.http.post<RegistroResponse>(this.api.buildUrl(this.resource), datos);
   }
 
   buscar(
@@ -41,6 +46,26 @@ export class RegistroService {
   rechazar(id: number, motivo: string): Observable<RegistroResponse> {
     return this.http.patch<RegistroResponse>(this.api.buildUrl(`${this.resource}/${id}/rechazar`), {
       motivo,
+    });
+  }
+
+  validarDetalle(id: number, detalleId: number): Observable<RegistroResponse> {
+    return this.http.patch<RegistroResponse>(
+      this.api.buildUrl(`${this.resource}/${id}/detalles/${detalleId}/validar`),
+      {},
+    );
+  }
+
+  rechazarDetalle(id: number, detalleId: number, motivo: string): Observable<RegistroResponse> {
+    return this.http.patch<RegistroResponse>(
+      this.api.buildUrl(`${this.resource}/${id}/detalles/${detalleId}/rechazar`),
+      { motivo },
+    );
+  }
+
+  foto(id: number, detalleId: number): Observable<Blob> {
+    return this.http.get(this.api.buildUrl(`${this.resource}/${id}/detalles/${detalleId}/foto`), {
+      responseType: 'blob',
     });
   }
 }

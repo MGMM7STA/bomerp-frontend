@@ -31,32 +31,33 @@
   display: block;
   margin-bottom: 8px;
   color: var(--ss-lime-ink);
-  font-size: 11px;
+  font-size: 0.78rem;
   font-weight: 800;
   letter-spacing: 1.5px;
 }
 
 h1 {
-  margin: 0;
-  font-size: clamp(25px, 3vw, 34px);
-  letter-spacing: -0.8px;
+  margin: 0 0 0.3rem;
+  font-size: 1.75rem;
+  line-height: 1.15;
+  color: var(--ss-navy);
 }
 
 h2 {
   margin: 0 0 6px;
-  font-size: 20px;
+  font-size: 1.25rem;
 }
 
 h3 {
   margin: 0 0 8px;
-  font-size: 16px;
+  font-size: 1rem;
 }
 
 p {
   margin: 6px 0 0;
   color: var(--ss-muted);
   line-height: 1.5;
-  font-size: 13px;
+  font-size: 0.9rem;
 }
 
 .panel {
@@ -85,7 +86,7 @@ p {
   border-radius: 9px;
   padding: 10px 15px;
   font: inherit;
-  font-size: 13px;
+  font-size: 0.9rem;
   font-weight: 700;
   cursor: pointer;
   transition: filter 0.15s, transform 0.15s;
@@ -123,7 +124,7 @@ p {
 
 .btn-small {
   padding: 7px 10px;
-  font-size: 12px;
+  font-size: 0.82rem;
 }
 
 .form-grid {
@@ -137,7 +138,7 @@ label {
   flex-direction: column;
   gap: 8px;
   color: var(--ss-text);
-  font-size: 13px;
+  font-size: 0.9rem;
   font-weight: 700;
 }
 
@@ -151,7 +152,7 @@ input {
   color: var(--ss-ink);
   background: #fff;
   font: inherit;
-  font-size: 14px;
+  font-size: 0.93rem;
   outline: none;
 }
 
@@ -183,7 +184,7 @@ input:focus {
   border-radius: 20px;
   background: #f2f6fa;
   color: var(--ss-navy);
-  font-size: 12px;
+  font-size: 0.82rem;
   font-weight: 700;
 }
 
@@ -203,7 +204,7 @@ table {
   width: 100%;
   border-collapse: collapse;
   text-align: left;
-  font-size: 13px;
+  font-size: 0.9rem;
 }
 
 thead {
@@ -212,7 +213,7 @@ thead {
 
 th {
   color: var(--ss-muted);
-  font-size: 11px;
+  font-size: 0.78rem;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.4px;
@@ -243,7 +244,7 @@ tbody tr:hover {
   display: inline-block;
   padding: 6px 9px;
   border-radius: 20px;
-  font-size: 11px;
+  font-size: 0.78rem;
   font-weight: 800;
 }
 
@@ -261,7 +262,7 @@ tbody tr:hover {
   margin-bottom: 18px;
   padding: 13px 16px;
   border-radius: 10px;
-  font-size: 13px;
+  font-size: 0.9rem;
   line-height: 1.5;
 }
 
@@ -281,14 +282,14 @@ tbody tr:hover {
   padding: 38px 16px;
   color: var(--ss-muted);
   text-align: center;
-  font-size: 13px;
+  font-size: 0.9rem;
 }
 
 .empty-icon {
   display: block;
   margin-bottom: 12px;
   color: #8fa9c4;
-  font-size: 35px;
+  font-size: 2.2rem;
 }
 
 .empty-state h3 {
@@ -317,12 +318,12 @@ tbody tr:hover {
 
 .summary-item span {
   color: var(--ss-muted);
-  font-size: 12px;
+  font-size: 0.82rem;
 }
 
 .summary-item strong {
   overflow-wrap: anywhere;
-  font-size: 14px;
+  font-size: 0.93rem;
 }
 
 @media (max-width: 900px) {

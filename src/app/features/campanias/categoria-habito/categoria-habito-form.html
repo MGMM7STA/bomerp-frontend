@@ -13,22 +13,25 @@
         <p class="ss-descripcion">Cargando...</p>
       }
 
-      <mat-form-field>
-        <mat-label>Nombre</mat-label>
-        <input matInput type="text" formControlName="nombre" />
-      </mat-form-field>
-      <app-mensaje-error [texto]="mensajeValidacion('nombre')" />
+      <div class="ss-campo">
+        <label for="nombre">Nombre</label>
+        <input id="nombre" class="ss-input" type="text" formControlName="nombre" placeholder="Ej. Actividad física" />
+        <app-mensaje-error [texto]="mensajeValidacion('nombre')" />
+      </div>
 
-      <mat-form-field>
-        <mat-label>Descripción</mat-label>
-        <textarea matInput formControlName="descripcion"></textarea>
-      </mat-form-field>
-      <app-mensaje-error [texto]="mensajeValidacion('descripcion')" />
+      <div class="ss-campo">
+        <label for="descripcion">Descripción</label>
+        <textarea id="descripcion" class="ss-input" formControlName="descripcion" placeholder="Qué tipo de hábitos agrupa"></textarea>
+        <app-mensaje-error [texto]="mensajeValidacion('descripcion')" />
+      </div>
 
       <app-mensaje-error [texto]="error()" />
 
       <div class="ss-form-pie">
-        <button class="ss-btn ss-btn-primario" type="submit" [disabled]="loading() || errorCarga()">Guardar</button>
+        <button class="ss-btn ss-btn-primario" type="submit" [disabled]="loading() || errorCarga()">
+          <span class="material-symbols-outlined">save</span>
+          Guardar
+        </button>
         <button class="ss-btn ss-btn-secundario" type="button" (click)="cancelar()">Cancelar</button>
       </div>
     </form>

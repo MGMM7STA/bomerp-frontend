@@ -20,43 +20,47 @@
         </p>
       }
 
-      <mat-form-field>
-        <mat-label>Categoría de hábito</mat-label>
-        <mat-select formControlName="categoriaId">
-          <mat-option [value]="0" disabled>Selecciona una categoría</mat-option>
+      <div class="ss-campo">
+        <label for="categoria">Categoría</label>
+        <select id="categoria" class="ss-input" formControlName="categoriaId">
+          <option [ngValue]="0" disabled>Elige una categoría</option>
           @for (categoria of categorias(); track categoria.id) {
-            <mat-option [value]="categoria.id">{{ categoria.nombre }}</mat-option>
+            <option [ngValue]="categoria.id">{{ categoria.nombre }}</option>
           }
-        </mat-select>
-      </mat-form-field>
-      <app-mensaje-error [texto]="mensajeValidacion('categoriaId')" />
+        </select>
+        <app-mensaje-error [texto]="mensajeValidacion('categoriaId')" />
+      </div>
 
-      <mat-form-field>
-        <mat-label>Nombre</mat-label>
-        <input matInput type="text" formControlName="nombre" />
-      </mat-form-field>
-      <app-mensaje-error [texto]="mensajeValidacion('nombre')" />
+      <div class="ss-campo">
+        <label for="nombre">Nombre</label>
+        <input id="nombre" class="ss-input" type="text" formControlName="nombre" placeholder="Ej. Caminata de 30 minutos" />
+        <app-mensaje-error [texto]="mensajeValidacion('nombre')" />
+      </div>
 
-      <mat-form-field>
-        <mat-label>Descripción</mat-label>
-        <textarea matInput formControlName="descripcion"></textarea>
-      </mat-form-field>
-      <app-mensaje-error [texto]="mensajeValidacion('descripcion')" />
+      <div class="ss-campo">
+        <label for="descripcion">Descripción</label>
+        <textarea id="descripcion" class="ss-input" formControlName="descripcion" placeholder="Qué cuenta como evidencia de este hábito"></textarea>
+        <app-mensaje-error [texto]="mensajeValidacion('descripcion')" />
+      </div>
 
-      <mat-form-field>
-        <mat-label>Puntaje base</mat-label>
-        <input matInput type="number" step="0.01" min="0.01" formControlName="puntajeBase" />
-      </mat-form-field>
-      <app-mensaje-error [texto]="mensajeValidacion('puntajeBase')" />
+      <div class="ss-form-fila">
+        <div class="ss-campo">
+          <label for="puntaje">Puntaje base</label>
+          <input id="puntaje" class="ss-input" type="number" step="0.01" min="0.01" formControlName="puntajeBase" />
+          <small>Puntos por cada vez validada.</small>
+          <app-mensaje-error [texto]="mensajeValidacion('puntajeBase')" />
+        </div>
 
-      <mat-form-field>
-        <mat-label>Estado</mat-label>
-        <mat-select formControlName="activo">
-          <mat-option [value]="1">Activo</mat-option>
-          <mat-option [value]="0">Inactivo</mat-option>
-        </mat-select>
-      </mat-form-field>
-      <app-mensaje-error [texto]="mensajeValidacion('activo')" />
+        <div class="ss-campo">
+          <label for="activo">Estado</label>
+          <select id="activo" class="ss-input" formControlName="activo">
+            <option [ngValue]="1">Activo</option>
+            <option [ngValue]="0">Inactivo</option>
+          </select>
+          <small>Los inactivos no se pueden registrar.</small>
+          <app-mensaje-error [texto]="mensajeValidacion('activo')" />
+        </div>
+      </div>
 
       <app-mensaje-error [texto]="error()" />
 
@@ -65,6 +69,7 @@
           class="ss-btn ss-btn-primario"
           type="submit"
           [disabled]="loading() || errorCarga() || categorias().length === 0">
+          <span class="material-symbols-outlined">save</span>
           Guardar
         </button>
         <button class="ss-btn ss-btn-secundario" type="button" (click)="cancelar()">Cancelar</button>

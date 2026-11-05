@@ -39,9 +39,7 @@ export class RegistroReporteComponent implements OnInit {
   );
 
   protected readonly puntajeAcumulado = computed(() =>
-    this.registros()
-      .filter((r) => r.estado === 'VALIDADO')
-      .reduce((suma, r) => suma + Number(r.puntajeTotal), 0),
+    this.registros().reduce((suma, r) => suma + Number(r.puntajeValidado ?? 0), 0),
   );
 
   protected readonly puntajePromedio = computed(() =>

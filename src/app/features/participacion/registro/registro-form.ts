@@ -1,5 +1,5 @@
 import { DecimalPipe } from '@angular/common';
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
 import { CampaniaService } from '../../campanias/campania/campania-service';
@@ -7,6 +7,7 @@ import { Campania } from '../../campanias/campania/campania.model';
 import { Habito } from '../../campanias/habito/habito.model';
 import { consumeCupo } from '../../../shared/utilidades/estados';
 import { mensajeDeError } from '../../../shared/utilidades/errores';
+import { comprimirImagen } from '../../../shared/utilidades/imagen';
 import { claveDia } from '../../../core/inicio/fechas';
 import { RegistroService } from './registro-service';
 import { RegistroResponse } from './registro.model';
@@ -15,7 +16,8 @@ interface Linea {
   habito: Habito;
   veces: number;
   descripcion: string;
-  urlImagen: string;
+  foto: Blob | null;
+  vista: string | null;
 }
 
 type Paso = 1 | 2 | 3;
@@ -26,7 +28,7 @@ type Paso = 1 | 2 | 3;
   templateUrl: './registro-form.html',
   styleUrl: './registro-form.css',
 })
-export class RegistroForm implements OnInit {
+export class RegistroForm implements OnInit, OnDestroy {
   private readonly campaniaService = inject(CampaniaService);
   private readonly registroService = inject(RegistroService);
 
@@ -47,6 +49,7 @@ export class RegistroForm implements OnInit {
   protected readonly error = signal<string | null>(null);
   protected readonly enviando = signal(false);
   protected readonly creado = signal<RegistroResponse | null>(null);
+  protected readonly procesando = signal<number | null>(null);
 
   protected readonly categorias = computed(() => {
     const vistas = new Map<number, string>();
@@ -114,11 +117,16 @@ export class RegistroForm implements OnInit {
   }
 
   protected alternar(habito: Habito): void {
-    this.lineas.update((lista) =>
-      lista.some((linea) => linea.habito.id === habito.id)
-        ? lista.filter((linea) => linea.habito.id !== habito.id)
-        : [...lista, { habito, veces: 1, descripcion: '', urlImagen: '' }],
-    );
+    const existente = this.lineas().find((linea) => linea.habito.id === habito.id);
+    if (existente) {
+      this.soltarVista(existente);
+      this.lineas.update((lista) => lista.filter((linea) => linea.habito.id !== habito.id));
+    } else {
+      this.lineas.update((lista) => [
+        ...lista,
+        { habito, veces: 1, descripcion: '', foto: null, vista: null },
+      ]);
+    }
   }
 
   protected filtrar(categoriaId: number | null): void {
@@ -133,14 +141,47 @@ export class RegistroForm implements OnInit {
     );
   }
 
-  protected escribir(indice: number, campo: 'descripcion' | 'urlImagen', evento: Event): void {
-    const valor = (evento.target as HTMLInputElement | HTMLTextAreaElement).value;
+  protected escribir(indice: number, evento: Event): void {
+    const valor = (evento.target as HTMLTextAreaElement).value;
     this.lineas.update((lista) =>
-      lista.map((linea, i) => (i === indice ? { ...linea, [campo]: valor } : linea)),
+      lista.map((linea, i) => (i === indice ? { ...linea, descripcion: valor } : linea)),
+    );
+  }
+
+  protected async elegirFoto(indice: number, evento: Event): Promise<void> {
+    const entrada = evento.target as HTMLInputElement;
+    const archivo = entrada.files?.[0];
+    entrada.value = '';
+    if (!archivo) return;
+    if (!archivo.type.startsWith('image/')) {
+      this.error.set('Ese archivo no es una imagen. Elige una foto JPG o PNG.');
+      return;
+    }
+    this.error.set(null);
+    this.procesando.set(indice);
+    try {
+      const foto = await comprimirImagen(archivo);
+      const vista = URL.createObjectURL(foto);
+      this.soltarVista(this.lineas()[indice]);
+      this.lineas.update((lista) =>
+        lista.map((linea, i) => (i === indice ? { ...linea, foto, vista } : linea)),
+      );
+    } catch {
+      this.error.set('No se pudo leer la foto. Prueba con otra imagen.');
+    } finally {
+      this.procesando.set(null);
+    }
+  }
+
+  protected quitarFoto(indice: number): void {
+    this.soltarVista(this.lineas()[indice]);
+    this.lineas.update((lista) =>
+      lista.map((linea, i) => (i === indice ? { ...linea, foto: null, vista: null } : linea)),
     );
   }
 
   protected quitar(indice: number): void {
+    this.soltarVista(this.lineas()[indice]);
     this.lineas.update((lista) => lista.filter((_, i) => i !== indice));
     if (this.lineas().length === 0) {
       this.paso.set(1);
@@ -173,9 +214,9 @@ export class RegistroForm implements OnInit {
       habitoId: linea.habito.id,
       veces: linea.veces,
       descripcion: linea.descripcion.trim() || undefined,
-      urlImagen: linea.urlImagen.trim() || undefined,
     }));
-    this.registroService.crear({ detalles }).subscribe({
+    const fotos = this.lineas().map((linea) => linea.foto);
+    this.registroService.crear({ detalles }, fotos).subscribe({
       next: (registro) => {
         this.creado.set(registro);
         this.enviando.set(false);
@@ -197,8 +238,17 @@ export class RegistroForm implements OnInit {
 
   protected nuevoRegistro(): void {
     this.creado.set(null);
+    this.lineas().forEach((linea) => this.soltarVista(linea));
     this.lineas.set([]);
     this.paso.set(1);
     this.registroService.buscar().subscribe({ next: (data) => this.registros.set(data) });
+  }
+
+  ngOnDestroy(): void {
+    this.lineas().forEach((linea) => this.soltarVista(linea));
+  }
+
+  private soltarVista(linea: Linea | undefined): void {
+    if (linea?.vista) URL.revokeObjectURL(linea.vista);
   }
 }
