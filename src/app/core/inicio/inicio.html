@@ -1,6 +1,43 @@
-<h2>Bienvenido a BomERP</h2>
-<p>Usa el menu de la izquierda para navegar entre los modulos disponibles.</p>
-<ul>
-  <li><strong>Categorias</strong>: catalogo de productos del ejercicio de clase.</li>
-  <li><strong>Categorias de habito</strong>: catalogo del modulo campanias de Semestre Saludable.</li>
-</ul>
+@if (!auth.autenticado()) {
+  <section class="portada">
+    <div class="portada-texto">
+      <img src="logo.png" alt="Universidad Saludable" class="portada-logo" />
+      <h1>Tus hábitos saludables, registrados en segundos</h1>
+      <p>
+        Practica un hábito, súbelo desde el celular y suma puntos. La coordinación valida tus
+        evidencias y al cierre de la campaña se premia la constancia.
+      </p>
+      <button type="button" class="ss-btn ss-btn-primario boton-grande" (click)="auth.iniciarLogin()">
+        <span class="material-symbols-outlined">login</span>
+        Ingresar con mi cuenta
+      </button>
+    </div>
+    <ol class="pasos">
+      <li>
+        <span class="paso-icono material-symbols-outlined">photo_camera</span>
+        <div>
+          <strong>Registra</strong>
+          <p>Eliges el hábito del día, cuántas veces lo hiciste y adjuntas tu foto.</p>
+        </div>
+      </li>
+      <li>
+        <span class="paso-icono material-symbols-outlined">fact_check</span>
+        <div>
+          <strong>Se valida</strong>
+          <p>Coordinación revisa la evidencia. Si algo falta, te dice el motivo.</p>
+        </div>
+      </li>
+      <li>
+        <span class="paso-icono material-symbols-outlined">emoji_events</span>
+        <div>
+          <strong>Se premia</strong>
+          <p>Cada evidencia validada suma a tu puntaje de la campaña.</p>
+        </div>
+      </li>
+    </ol>
+  </section>
+} @else if (esCoordinacion()) {
+  <app-panel-coordinacion />
+} @else {
+  <app-inicio-estudiante />
+}

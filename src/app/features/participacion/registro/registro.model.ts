@@ -1,3 +1,5 @@
+export type EstadoRegistro = 'BORRADOR' | 'ENVIADO' | 'VALIDADO' | 'RECHAZADO' | 'ANULADO';
+
 export interface DetalleEvidenciaRequest {
   habitoId: number;
   veces: number;
@@ -6,7 +8,6 @@ export interface DetalleEvidenciaRequest {
 }
 
 export interface RegistroRequest {
-  estudianteId: number;
   detalles: DetalleEvidenciaRequest[];
 }
 
@@ -25,8 +26,11 @@ export interface RegistroResponse {
   estudianteId: number;
   campaniaId: number;
   fecha: string;
-  estado: string;
+  estado: EstadoRegistro;
   totalEvidencias: number;
   puntajeTotal: number;
+  motivoRechazo?: string | null;
+  revisadoPor?: string | null;
+  fechaRevision?: string | null;
   detalles: DetalleEvidenciaResponse[];
 }

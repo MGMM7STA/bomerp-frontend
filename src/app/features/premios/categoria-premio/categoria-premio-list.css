@@ -17,7 +17,7 @@
 }
 
 .eyebrow {
-  color: #7658dc;
+  color: var(--ss-lime-ink);
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 1.4px;
@@ -32,7 +32,7 @@
 .table-heading p,
 .form-heading p {
   margin: 0;
-  color: #88899d;
+  color: var(--ss-muted);
   font-size: 13px;
   line-height: 1.7;
 }
@@ -60,19 +60,19 @@ button:disabled {
 }
 
 .primary-button {
-  border: 1px solid #6c4ce4;
-  background: #6c4ce4;
+  border: 1px solid var(--ss-navy);
+  background: var(--ss-navy);
   color: white;
 }
 
 .primary-button:hover {
-  background: #5839ce;
+  background: var(--ss-navy-700);
 }
 
 .secondary-button {
-  border: 1px solid #e4e3ee;
+  border: 1px solid var(--ss-line);
   background: white;
-  color: #5d5c73;
+  color: var(--ss-text);
 }
 
 .notice {
@@ -83,23 +83,23 @@ button:disabled {
 }
 
 .success {
-  background: #e9f8f0;
-  color: #16794b;
+  background: var(--ss-lime-soft);
+  color: var(--ss-lime-ink);
 }
 
 .error {
-  background: #fff0f0;
-  color: #b42332;
+  background: #fdecec;
+  color: var(--ss-red);
 }
 
 .form-card,
 .table-card {
   margin-bottom: 22px;
   padding: 24px;
-  border: 1px solid #e9e8f1;
+  border: 1px solid var(--ss-line);
   border-radius: 15px;
   background: white;
-  box-shadow: 0 4px 16px #29204406;
+  box-shadow: 0 4px 16px rgba(27, 39, 51, 0.02);
 }
 
 .form-heading,
@@ -120,7 +120,7 @@ button:disabled {
 .close-button {
   border: none;
   background: transparent;
-  color: #77788d;
+  color: var(--ss-muted);
   font-size: 27px;
 }
 
@@ -139,10 +139,10 @@ button:disabled {
 .form-field textarea {
   width: 100%;
   padding: 12px 13px;
-  border: 1px solid #e4e3ee;
+  border: 1px solid var(--ss-line);
   border-radius: 8px;
   background: #fff;
-  color: #29283d;
+  color: var(--ss-ink);
   font: inherit;
   font-size: 13px;
   outline: none;
@@ -150,8 +150,8 @@ button:disabled {
 
 .form-field input:focus,
 .form-field textarea:focus {
-  border-color: #8064e8;
-  box-shadow: 0 0 0 3px #8064e81a;
+  border-color: var(--ss-navy);
+  box-shadow: 0 0 0 3px rgba(0, 56, 102, 0.10);
 }
 
 .form-field textarea {
@@ -182,8 +182,8 @@ table {
 
 th {
   padding: 14px 12px;
-  background: #f8f7fc;
-  color: #85859a;
+  background: #f2f6fa;
+  color: var(--ss-muted);
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.5px;
@@ -192,20 +192,20 @@ th {
 
 td {
   padding: 17px 12px;
-  border-bottom: 1px solid #f0eff5;
-  color: #66677d;
+  border-bottom: 1px solid #eef1f4;
+  color: var(--ss-text);
 }
 
 td strong {
-  color: #302f45;
+  color: var(--ss-ink);
 }
 
 .id-chip {
   display: inline-block;
   padding: 5px 8px;
   border-radius: 6px;
-  background: #f0ebff;
-  color: #6948df;
+  background: #f2f6fa;
+  color: var(--ss-navy-700);
   font-weight: 700;
 }
 
@@ -224,30 +224,30 @@ td strong {
 }
 
 .edit-button {
-  border: 1px solid #e1d9ff;
-  color: #6948df;
+  border: 1px solid var(--ss-navy-soft);
+  color: var(--ss-navy-700);
 }
 
 .delete-button {
-  border: 1px solid #ffdddd;
-  color: #cf414b;
+  border: 1px solid #f2c4c4;
+  color: var(--ss-red);
 }
 
 .empty-state {
   padding: 48px 15px;
   text-align: center;
-  color: #85869b;
+  color: var(--ss-muted);
   font-size: 13px;
 }
 
 .empty-icon {
-  color: #9a82ed;
+  color: #8fa9c4;
   font-size: 35px;
 }
 
 .empty-state h3 {
   margin: 12px 0 8px;
-  color: #34334a;
+  color: var(--ss-ink);
   font-size: 16px;
 }
 

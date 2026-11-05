@@ -16,44 +16,8 @@ export const routes: Routes = [
         loadComponent: () => import('./core/inicio/inicio').then((m) => m.Inicio),
       },
       {
-        path: 'catalogo/categorias',
-        canActivate: [authGuard],
-        loadComponent: () =>
-          import('./features/catalogo/categoria/categoria-list').then((m) => m.CategoriaList),
-      },
-      {
-        path: 'catalogo/categorias/nueva',
-        canActivate: [authGuard, rolGuard('ADMIN')],
-        loadComponent: () =>
-          import('./features/catalogo/categoria/categoria-form').then((m) => m.CategoriaForm),
-      },
-      {
-        path: 'catalogo/categorias/:id/editar',
-        canActivate: [authGuard, rolGuard('ADMIN')],
-        loadComponent: () =>
-          import('./features/catalogo/categoria/categoria-form').then((m) => m.CategoriaForm),
-      },
-      {
-        path: 'catalogo/productos',
-        canActivate: [authGuard],
-        loadComponent: () =>
-          import('./features/catalogo/producto/producto-list').then((m) => m.ProductoList),
-      },
-      {
-        path: 'catalogo/productos/nuevo',
-        canActivate: [authGuard, rolGuard('ADMIN')],
-        loadComponent: () =>
-          import('./features/catalogo/producto/producto-form').then((m) => m.ProductoForm),
-      },
-      {
-        path: 'catalogo/productos/:id/editar',
-        canActivate: [authGuard, rolGuard('ADMIN')],
-        loadComponent: () =>
-          import('./features/catalogo/producto/producto-form').then((m) => m.ProductoForm),
-      },
-      {
         path: 'campanias/categorias-habito',
-        canActivate: [authGuard],
+        canActivate: [authGuard, rolGuard('ADMIN')],
         loadComponent: () =>
           import('./features/campanias/categoria-habito/categoria-habito-list').then(
             (m) => m.CategoriaHabitoList,
@@ -61,7 +25,7 @@ export const routes: Routes = [
       },
       {
         path: 'campanias/categorias-habito/nueva',
-        canActivate: [authGuard, rolGuard('COORDINADOR', 'ADMIN')],
+        canActivate: [authGuard, rolGuard('ADMIN')],
         loadComponent: () =>
           import('./features/campanias/categoria-habito/categoria-habito-form').then(
             (m) => m.CategoriaHabitoForm,
@@ -69,7 +33,7 @@ export const routes: Routes = [
       },
       {
         path: 'campanias/categorias-habito/:id/editar',
-        canActivate: [authGuard, rolGuard('COORDINADOR', 'ADMIN')],
+        canActivate: [authGuard, rolGuard('ADMIN')],
         loadComponent: () =>
           import('./features/campanias/categoria-habito/categoria-habito-form').then(
             (m) => m.CategoriaHabitoForm,
@@ -77,42 +41,65 @@ export const routes: Routes = [
       },
       {
         path: 'campanias/habitos',
-        canActivate: [authGuard],
+        canActivate: [authGuard, rolGuard('COORDINADOR', 'ADMIN')],
         loadComponent: () =>
           import('./features/campanias/habito/habito-list').then((m) => m.HabitoList),
       },
       {
         path: 'campanias/habitos/nuevo',
-        canActivate: [authGuard, rolGuard('COORDINADOR', 'ADMIN')],
+        canActivate: [authGuard, rolGuard('ADMIN')],
         loadComponent: () =>
           import('./features/campanias/habito/habito-form').then((m) => m.HabitoForm),
       },
       {
         path: 'campanias/habitos/:id/editar',
-        canActivate: [authGuard, rolGuard('COORDINADOR', 'ADMIN')],
+        canActivate: [authGuard, rolGuard('ADMIN')],
         loadComponent: () =>
           import('./features/campanias/habito/habito-form').then((m) => m.HabitoForm),
       },
       {
-        path: 'ventas/nueva',
-        canActivate: [authGuard, rolGuard('VENDEDOR', 'SUPERVISOR')],
-        loadComponent: () => import('./features/ventas/venta/venta-form').then((m) => m.VentaForm),
-      },
-      {
-        path: 'ventas/reporte',
-        canActivate: [authGuard],
+        path: 'campanias',
+        canActivate: [authGuard, rolGuard('ADMIN')],
         loadComponent: () =>
-          import('./features/ventas/venta/venta-reporte').then((m) => m.VentaReporteComponent),
+          import('./features/campanias/campania/campania-list').then((m) => m.CampaniaList),
       },
       {
-        path: 'participacion/nuevo',
-        canActivate: [authGuard, rolGuard('ESTUDIANTE', 'COORDINADOR')],
+        path: 'campanias/nueva',
+        canActivate: [authGuard, rolGuard('ADMIN')],
+        loadComponent: () =>
+          import('./features/campanias/campania/campania-form').then((m) => m.CampaniaForm),
+      },
+      {
+        path: 'campanias/:id/editar',
+        canActivate: [authGuard, rolGuard('ADMIN')],
+        loadComponent: () =>
+          import('./features/campanias/campania/campania-form').then((m) => m.CampaniaForm),
+      },
+      {
+        path: 'participacion/registrar',
+        canActivate: [authGuard, rolGuard('ESTUDIANTE')],
         loadComponent: () =>
           import('./features/participacion/registro/registro-form').then((m) => m.RegistroForm),
       },
       {
+        path: 'participacion/nuevo',
+        redirectTo: 'participacion/registrar',
+      },
+      {
+        path: 'participacion/mis-registros',
+        canActivate: [authGuard, rolGuard('ESTUDIANTE')],
+        loadComponent: () =>
+          import('./features/participacion/mis-registros/mis-registros').then((m) => m.MisRegistros),
+      },
+      {
+        path: 'participacion/validacion',
+        canActivate: [authGuard, rolGuard('COORDINADOR', 'ADMIN')],
+        loadComponent: () =>
+          import('./features/participacion/validacion/validacion').then((m) => m.Validacion),
+      },
+      {
         path: 'participacion/reporte',
-        canActivate: [authGuard],
+        canActivate: [authGuard, rolGuard('COORDINADOR', 'ADMIN')],
         loadComponent: () =>
           import('./features/participacion/registro/registro-reporte').then(
             (m) => m.RegistroReporteComponent,
@@ -145,5 +132,9 @@ export const routes: Routes = [
         loadComponent: () => import('./core/sin-permiso/sin-permiso').then((m) => m.SinPermiso),
       },
     ],
+  },
+  {
+    path: '**',
+    redirectTo: '',
   },
 ];

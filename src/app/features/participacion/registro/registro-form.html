@@ -1,88 +1,247 @@
-<h2>Registrar participacion diaria</h2>
+<section class="ss-pagina">
+  <header class="ss-cabecera">
+    <div>
+      <span class="ss-eyebrow">Mi participación</span>
+      <h1 class="ss-titulo">Registrar participación</h1>
+      <p class="ss-descripcion">Elige lo que cumpliste hoy, cuéntanos cómo fue y envíalo a coordinación.</p>
+    </div>
+    @if (campania() && !creado()) {
+      <div class="cupo" [class.agotado]="restantesHoy() === 0">
+        <span class="material-symbols-outlined">bolt</span>
+        <div>
+          <strong>{{ restantesHoy() }} de {{ maximo() }}</strong>
+          <span>evidencias libres hoy</span>
+        </div>
+      </div>
+    }
+  </header>
 
-<form [formGroup]="form">
-  @if (error()) {
-    <p class="error">{{ error() }}</p>
-  }
-
-  <p>
-    <label>
-      Estudiante
-      <input type="number" step="1" min="1" formControlName="estudianteId" />
-    </label>
-  </p>
-
-  <table formArrayName="detalles">
-    <thead>
-      <tr>
-        <th>Habito</th>
-        <th>Puntaje unitario</th>
-        <th>Veces</th>
-        <th>Descripcion</th>
-        <th>URL de la foto</th>
-        <th>Subtotal</th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody>
-      @for (linea of lineasForm.controls; track linea) {
-        <tr [formGroupName]="$index">
-          <td>
-            <mat-form-field>
-              <input
-                type="text"
-                matInput
-                formControlName="busqueda"
-                [matAutocomplete]="auto"
-                placeholder="Buscar habito"
-              />
-              <mat-autocomplete #auto="matAutocomplete" (optionSelected)="seleccionarHabito($index, $event)">
-                @for (habito of opcionesPorLinea()[$index]; track habito.id) {
-                  <mat-option [value]="habito">
-                    {{ habito.nombre }} — {{ habito.puntajeBase | number: '1.2-2' }} pts
-                  </mat-option>
-                }
-              </mat-autocomplete>
-            </mat-form-field>
-          </td>
-          <td>{{ puntajesUnitarios()[$index] | number: '1.2-2' }} pts</td>
-          <td>
-            <input type="number" step="1" min="1" formControlName="veces" />
-          </td>
-          <td>
-            <input type="text" formControlName="descripcion" placeholder="Opcional" />
-          </td>
-          <td>
-            <input type="text" formControlName="urlImagen" placeholder="Opcional" />
-          </td>
-          <td>{{ subtotales()[$index] | number: '1.2-2' }} pts</td>
-          <td>
-            <button type="button" (click)="quitarLinea($index)" [disabled]="lineasForm.length === 1">
-              Quitar
-            </button>
-          </td>
-        </tr>
+  @if (cargando()) {
+    <div class="ss-tarjeta ss-vacio">Cargando la campaña...</div>
+  } @else if (sinCampania()) {
+    <div class="ss-tarjeta estado-vacio">
+      <span class="material-symbols-outlined">event_busy</span>
+      <h2>No hay una campaña activa</h2>
+      <p>Cuando coordinación abra una campaña vas a poder registrar tus hábitos aquí.</p>
+      <a class="ss-btn ss-btn-secundario" routerLink="/">Volver al inicio</a>
+    </div>
+  } @else if (creado(); as registro) {
+    <div class="ss-tarjeta estado-vacio exito">
+      <span class="material-symbols-outlined">task_alt</span>
+      <h2>Registro enviado</h2>
+      <p>
+        Mandaste {{ registro.totalEvidencias }} {{ registro.totalEvidencias === 1 ? 'evidencia' : 'evidencias' }} por
+        {{ registro.puntajeTotal | number: '1.0-2' }} puntos. Coordinación las revisará y los puntos se suman cuando
+        las valide.
+      </p>
+      <div class="ss-acciones centro">
+        <a class="ss-btn ss-btn-primario" routerLink="/participacion/mis-registros">
+          <span class="material-symbols-outlined">history</span>
+          Ver mis registros
+        </a>
+        @if (restantesHoy() > 0) {
+          <button type="button" class="ss-btn ss-btn-secundario" (click)="nuevoRegistro()">
+            <span class="material-symbols-outlined">add</span>
+            Registrar otro
+          </button>
+        }
+      </div>
+    </div>
+  } @else if (restantesHoy() === 0 && registros().length > 0) {
+    <div class="ss-tarjeta estado-vacio">
+      <span class="material-symbols-outlined">hourglass_bottom</span>
+      <h2>Ya usaste tu cupo de hoy</h2>
+      <p>La campaña permite {{ maximo() }} evidencias por día. Mañana puedes seguir sumando.</p>
+      <a class="ss-btn ss-btn-secundario" routerLink="/participacion/mis-registros">Ver mis registros</a>
+    </div>
+  } @else {
+    <ol class="pasos">
+      @for (p of pasos; track p.numero) {
+        <li [class.actual]="paso() === p.numero" [class.hecho]="paso() > p.numero">
+          <button type="button" (click)="irA($any(p.numero))" [disabled]="p.numero > paso() && !puedeSeguir()">
+            <span class="numero">
+              @if (paso() > p.numero) {
+                <span class="material-symbols-outlined">check</span>
+              } @else {
+                {{ p.numero }}
+              }
+            </span>
+            <span class="texto">{{ p.texto }}</span>
+          </button>
+        </li>
       }
-    </tbody>
-    <tfoot>
-      <tr>
-        <td colspan="2">Evidencias totales</td>
-        <td>{{ totalEvidencias() }}</td>
-        <td colspan="2">Puntaje total</td>
-        <td>{{ puntajeTotal() | number: '1.2-2' }} pts</td>
-        <td></td>
-      </tr>
-    </tfoot>
-  </table>
+    </ol>
 
-  @if (!coleccionValida()) {
-    <p class="error">
-      El registro necesita al menos una evidencia, con su habito elegido de la lista y un numero de veces de al menos 1.
-    </p>
+    @if (error()) {
+      <div class="ss-aviso ss-aviso-error">
+        <span class="material-symbols-outlined">error</span>
+        <span>{{ error() }}</span>
+      </div>
+    }
+
+    @switch (paso()) {
+      @case (1) {
+        <div class="ss-tarjeta">
+          <div class="ss-filtros">
+            <h2 class="ss-tarjeta-titulo">¿Qué hiciste hoy?</h2>
+            @if (categorias().length > 1) {
+              <div class="ss-chips">
+                <button type="button" class="ss-chip" [class.activo]="categoriaFiltro() === null" (click)="filtrar(null)">
+                  Todos
+                </button>
+                @for (categoria of categorias(); track categoria.id) {
+                  <button
+                    type="button"
+                    class="ss-chip"
+                    [class.activo]="categoriaFiltro() === categoria.id"
+                    (click)="filtrar(categoria.id)">
+                    {{ categoria.nombre }}
+                  </button>
+                }
+              </div>
+            }
+          </div>
+
+          <div class="habitos">
+            @for (habito of habitosVisibles(); track habito.id) {
+              <button
+                type="button"
+                class="habito"
+                [class.elegido]="seleccionado(habito)"
+                [attr.aria-pressed]="seleccionado(habito)"
+                (click)="alternar(habito)">
+                <span class="marca">
+                  <span class="material-symbols-outlined">{{ seleccionado(habito) ? 'check' : 'add' }}</span>
+                </span>
+                <span class="habito-cuerpo">
+                  <span class="ss-etiqueta">{{ habito.categoria.nombre }}</span>
+                  <strong>{{ habito.nombre }}</strong>
+                  @if (habito.descripcion) {
+                    <small>{{ habito.descripcion }}</small>
+                  }
+                </span>
+                <span class="puntos">{{ habito.puntajeBase | number: '1.0-2' }} pts</span>
+              </button>
+            } @empty {
+              <p class="ss-vacio">La campaña todavía no tiene hábitos.</p>
+            }
+          </div>
+        </div>
+      }
+      @case (2) {
+        <div class="detalle">
+          @for (linea of lineas(); track linea.habito.id; let i = $index) {
+            <article class="ss-tarjeta linea">
+              <header class="linea-cabecera">
+                <div>
+                  <span class="ss-etiqueta">{{ linea.habito.categoria.nombre }}</span>
+                  <h3>{{ linea.habito.nombre }}</h3>
+                </div>
+                <button type="button" class="icono-quitar" (click)="quitar(i)" aria-label="Quitar hábito">
+                  <span class="material-symbols-outlined">close</span>
+                </button>
+              </header>
+
+              <div class="linea-cuerpo">
+                <div class="ss-campo">
+                  <label>Veces</label>
+                  <div class="contador">
+                    <button type="button" (click)="cambiarVeces(i, -1)" [disabled]="linea.veces <= 1" aria-label="Menos">
+                      <span class="material-symbols-outlined">remove</span>
+                    </button>
+                    <output>{{ linea.veces }}</output>
+                    <button
+                      type="button"
+                      (click)="cambiarVeces(i, 1)"
+                      [disabled]="totalVeces() >= restantesHoy()"
+                      aria-label="Más">
+                      <span class="material-symbols-outlined">add</span>
+                    </button>
+                  </div>
+                  <small>{{ linea.habito.puntajeBase * linea.veces | number: '1.0-2' }} pts</small>
+                </div>
+
+                <div class="ss-campo crece">
+                  <label [attr.for]="'desc-' + i">¿Cómo fue?</label>
+                  <textarea
+                    class="ss-input"
+                    [id]="'desc-' + i"
+                    rows="2"
+                    maxlength="250"
+                    placeholder="Cuéntalo en una línea"
+                    [value]="linea.descripcion"
+                    (input)="escribir(i, 'descripcion', $event)"></textarea>
+                </div>
+
+                <div class="ss-campo crece">
+                  <label [attr.for]="'foto-' + i">Enlace de la foto</label>
+                  <input
+                    class="ss-input"
+                    [id]="'foto-' + i"
+                    type="url"
+                    placeholder="https://..."
+                    [value]="linea.urlImagen"
+                    (input)="escribir(i, 'urlImagen', $event)" />
+                  <small>Opcional. Ayuda a que coordinación valide más rápido.</small>
+                </div>
+              </div>
+            </article>
+          }
+          @if (excede()) {
+            <div class="ss-aviso ss-aviso-error">
+              <span class="material-symbols-outlined">warning</span>
+              <span>Te pasas por {{ totalVeces() - restantesHoy() }}: hoy solo te quedan {{ restantesHoy() }} evidencias.</span>
+            </div>
+          }
+        </div>
+      }
+      @case (3) {
+        <div class="ss-tarjeta">
+          <h2 class="ss-tarjeta-titulo">Revisa antes de enviar</h2>
+          <ul class="resumen">
+            @for (linea of lineas(); track linea.habito.id) {
+              <li>
+                <div>
+                  <strong>{{ linea.habito.nombre }}</strong>
+                  <small>{{ linea.descripcion || 'Sin descripción' }}</small>
+                </div>
+                <span class="veces">×{{ linea.veces }}</span>
+                <span class="pts">{{ linea.habito.puntajeBase * linea.veces | number: '1.0-2' }} pts</span>
+              </li>
+            }
+          </ul>
+          <div class="total">
+            <span>{{ totalVeces() }} {{ totalVeces() === 1 ? 'evidencia' : 'evidencias' }} · te quedarán {{ restantesHoy() - totalVeces() }} libres hoy</span>
+            <strong>{{ puntaje() | number: '1.0-2' }} pts</strong>
+          </div>
+          <div class="ss-aviso ss-aviso-info">
+            <span class="material-symbols-outlined">info</span>
+            <span>Los puntos se suman cuando coordinación valide tu registro.</span>
+          </div>
+        </div>
+      }
+    }
+
+    <footer class="navegacion">
+      @if (paso() > 1) {
+        <button type="button" class="ss-btn ss-btn-secundario" (click)="anterior()">
+          <span class="material-symbols-outlined">arrow_back</span>
+          Atrás
+        </button>
+      } @else {
+        <span class="seleccion">{{ lineas().length }} elegidos</span>
+      }
+      @if (paso() < 3) {
+        <button type="button" class="ss-btn ss-btn-primario" (click)="siguiente()" [disabled]="!puedeSeguir()">
+          Continuar
+          <span class="material-symbols-outlined">arrow_forward</span>
+        </button>
+      } @else {
+        <button type="button" class="ss-btn ss-btn-exito" (click)="enviar()" [disabled]="enviando() || !puedeSeguir()">
+          <span class="material-symbols-outlined">send</span>
+          {{ enviando() ? 'Enviando...' : 'Enviar registro' }}
+        </button>
+      }
+    </footer>
   }
-
-  <button type="button" (click)="agregarLinea()">Agregar evidencia</button>
-  <button type="button" (click)="confirmarYGuardar()" [disabled]="loading()">
-    Registrar participacion
-  </button>
-</form>
+</section>

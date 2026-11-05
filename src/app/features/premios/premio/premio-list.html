@@ -9,7 +9,7 @@
 
     @if (auth.tieneRol('COORDINADOR', 'ADMIN')) {
       <button class="primary-button" (click)="abrirNuevo()">
-        <span>＋</span> Nuevo premio
+        <span class="material-symbols-outlined">add</span> Nuevo premio
       </button>
     }
   </div>
@@ -29,7 +29,7 @@
           <h2>{{ editandoId === null ? 'Nuevo premio' : 'Editar premio' }}</h2>
           <p>Completa la información del premio.</p>
         </div>
-        <button class="close-button" type="button" (click)="cancelar()">×</button>
+        <button class="close-button" type="button" (click)="cancelar()" aria-label="Cerrar"><span class="material-symbols-outlined">close</span></button>
       </div>
 
       <form (ngSubmit)="guardar()">

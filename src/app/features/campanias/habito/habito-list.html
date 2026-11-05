@@ -1,55 +1,91 @@
-<h2>Habitos</h2>
-
-@if (loading()) {
-  <p>Cargando habitos...</p>
-}
-
-<app-mensaje-error [texto]="error()" />
-
-<a matButton="filled" routerLink="/campanias/habitos/nuevo">Nuevo habito</a>
-
-<mat-form-field>
-  <mat-label>Filtrar por categoria de habito</mat-label>
-  <mat-select [value]="0" (selectionChange)="filtrar($event.value)">
-    <mat-option [value]="0">Todas</mat-option>
-    @for (categoria of categorias(); track categoria.id) {
-      <mat-option [value]="categoria.id">{{ categoria.nombre }}</mat-option>
+<section class="ss-pagina">
+  <header class="ss-cabecera">
+    <div>
+      <span class="ss-eyebrow">Campañas</span>
+      <h1 class="ss-titulo">Hábitos</h1>
+      <p class="ss-descripcion">Lo que cuenta como hábito saludable y cuánto puntaje vale cada evidencia.</p>
+    </div>
+    @if (auth.tieneRol('ADMIN')) {
+      <a class="ss-btn ss-btn-primario" routerLink="/campanias/habitos/nuevo">
+        <span class="material-symbols-outlined">add</span>
+        Nuevo hábito
+      </a>
     }
-  </mat-select>
-</mat-form-field>
+  </header>
 
-<table>
-  <thead>
-    <tr>
-      <th>ID</th>
-      <th>Nombre</th>
-      <th>Categoria</th>
-      <th>Puntaje base</th>
-      <th>Activo</th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    @for (habito of habitos(); track habito.id) {
-      <tr>
-        <td>{{ habito.id }}</td>
-        <td>{{ habito.nombre }}</td>
-        <td>{{ habito.categoria.nombre }}</td>
-        <td>{{ habito.puntajeBase }}</td>
-        <td>{{ habito.activo === 1 ? 'Si' : 'No' }}</td>
-        <td>
-          <a matButton [routerLink]="['/campanias/habitos', habito.id, 'editar']">Editar</a>
-          <button matButton class="eliminar" (click)="eliminar(habito.id, habito.nombre)">
-            Eliminar
-          </button>
-        </td>
-      </tr>
-    } @empty {
-      @if (!loading() && !error()) {
+  <app-mensaje-error [texto]="error()" />
+
+  <div class="ss-tarjeta">
+    <div class="ss-filtros">
+      <h2 class="ss-tarjeta-titulo">{{ habitos().length }} hábitos</h2>
+      <mat-form-field subscriptSizing="dynamic">
+        <mat-label>Filtrar por categoría</mat-label>
+        <mat-select [value]="0" (selectionChange)="filtrar($event.value)">
+          <mat-option [value]="0">Todas</mat-option>
+          @for (categoria of categorias(); track categoria.id) {
+            <mat-option [value]="categoria.id">{{ categoria.nombre }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <table class="ss-tabla ss-tabla-apilable">
+      <thead>
         <tr>
-          <td colspan="6">No hay habitos registrados.</td>
+          <th>ID</th>
+          <th>Hábito</th>
+          <th>Categoría</th>
+          <th class="num">Puntaje base</th>
+          <th>Estado</th>
+          @if (auth.tieneRol('ADMIN')) {
+            <th>Acciones</th>
+          }
         </tr>
-      }
-    }
-  </tbody>
-</table>
+      </thead>
+      <tbody>
+        @for (habito of habitos(); track habito.id) {
+          <tr>
+            <td data-etiqueta="ID"><span class="ss-id">#{{ habito.id }}</span></td>
+            <td data-etiqueta="Hábito">
+              <div>
+                <strong>{{ habito.nombre }}</strong>
+                @if (habito.descripcion) {
+                  <div class="ss-descripcion">{{ habito.descripcion }}</div>
+                }
+              </div>
+            </td>
+            <td data-etiqueta="Categoría"><span class="ss-etiqueta">{{ habito.categoria.nombre }}</span></td>
+            <td data-etiqueta="Puntaje" class="num">{{ habito.puntajeBase }} pts</td>
+            <td data-etiqueta="Estado">
+              @if (habito.activo === 1) {
+                <span class="ss-badge ss-badge-ok">Activo</span>
+              } @else {
+                <span class="ss-badge ss-badge-gris">Inactivo</span>
+              }
+            </td>
+            @if (auth.tieneRol('ADMIN')) {
+              <td data-etiqueta="Acciones">
+                <div class="ss-acciones">
+                  <a class="ss-btn ss-btn-secundario ss-btn-chico" [routerLink]="['/campanias/habitos', habito.id, 'editar']">
+                    <span class="material-symbols-outlined">edit</span>
+                    Editar
+                  </a>
+                  <button type="button" class="ss-btn ss-btn-peligro ss-btn-chico" (click)="eliminar(habito.id, habito.nombre)">
+                    <span class="material-symbols-outlined">delete</span>
+                    Eliminar
+                  </button>
+                </div>
+              </td>
+            }
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="6" class="ss-vacio">
+              {{ loading() ? 'Cargando hábitos...' : 'No hay hábitos registrados.' }}
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</section>

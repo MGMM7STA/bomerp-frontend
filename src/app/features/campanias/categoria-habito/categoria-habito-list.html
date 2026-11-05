@@ -1,39 +1,62 @@
-<h2>Categorias de habito</h2>
-
-@if (loading()) {
-  <p>Cargando categorias de habito...</p>
-}
-
-<app-mensaje-error [texto]="error()" />
-
-<a matButton="filled" routerLink="/campanias/categorias-habito/nueva">Nueva categoria de habito</a>
-
-<table>
-  <thead>
-    <tr>
-      <th>ID</th>
-      <th>Nombre</th>
-      <th>Descripcion</th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    @for (categoria of categorias(); track categoria.id) {
-      <tr>
-        <td>{{ categoria.id }}</td>
-        <td>{{ categoria.nombre }}</td>
-        <td>{{ categoria.descripcion }}</td>
-        <td>
-          <a matButton [routerLink]="['/campanias/categorias-habito', categoria.id, 'editar']">Editar</a>
-          <button matButton class="eliminar" (click)="eliminar(categoria.id!, categoria.nombre)">Eliminar</button>
-        </td>
-      </tr>
-    } @empty {
-      @if (!loading() && !error()) {
-        <tr>
-          <td colspan="4">No hay categorias de habito registradas.</td>
-        </tr>
-      }
+<section class="ss-pagina">
+  <header class="ss-cabecera">
+    <div>
+      <span class="ss-eyebrow">Campañas</span>
+      <h1 class="ss-titulo">Categorías de hábito</h1>
+      <p class="ss-descripcion">Agrupan los hábitos de la campaña: actividad física, alimentación, descanso.</p>
+    </div>
+    @if (auth.tieneRol('ADMIN')) {
+      <a class="ss-btn ss-btn-primario" routerLink="/campanias/categorias-habito/nueva">
+        <span class="material-symbols-outlined">add</span>
+        Nueva categoría
+      </a>
     }
-  </tbody>
-</table>
+  </header>
+
+  <app-mensaje-error [texto]="error()" />
+
+  <div class="ss-tarjeta">
+    <h2 class="ss-tarjeta-titulo">{{ categorias().length }} categorías</h2>
+    <table class="ss-tabla ss-tabla-apilable">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Categoría</th>
+          <th>Descripción</th>
+          @if (auth.tieneRol('ADMIN')) {
+            <th>Acciones</th>
+          }
+        </tr>
+      </thead>
+      <tbody>
+        @for (categoria of categorias(); track categoria.id) {
+          <tr>
+            <td data-etiqueta="ID"><span class="ss-id">#{{ categoria.id }}</span></td>
+            <td data-etiqueta="Categoría"><strong>{{ categoria.nombre }}</strong></td>
+            <td data-etiqueta="Descripción">{{ categoria.descripcion || '—' }}</td>
+            @if (auth.tieneRol('ADMIN')) {
+              <td data-etiqueta="Acciones">
+                <div class="ss-acciones">
+                  <a class="ss-btn ss-btn-secundario ss-btn-chico" [routerLink]="['/campanias/categorias-habito', categoria.id, 'editar']">
+                    <span class="material-symbols-outlined">edit</span>
+                    Editar
+                  </a>
+                  <button type="button" class="ss-btn ss-btn-peligro ss-btn-chico" (click)="eliminar(categoria.id!, categoria.nombre)">
+                    <span class="material-symbols-outlined">delete</span>
+                    Eliminar
+                  </button>
+                </div>
+              </td>
+            }
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="4" class="ss-vacio">
+              {{ loading() ? 'Cargando categorías...' : 'No hay categorías de hábito registradas.' }}
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</section>

@@ -1,0 +1,116 @@
+<section class="ss-pagina">
+  <header class="ss-cabecera">
+    <div>
+      <span class="ss-eyebrow">Configuración</span>
+      <h1 class="ss-titulo">{{ id() ? 'Editar campaña' : 'Nueva campaña' }}</h1>
+      <p class="ss-descripcion">Arma la campaña con los hábitos que ya existen. Los hábitos se crean en su propia pantalla.</p>
+    </div>
+  </header>
+
+  @if (error()) {
+    <div class="ss-aviso ss-aviso-error">
+      <span class="material-symbols-outlined">error</span>
+      <span>{{ error() }}</span>
+    </div>
+  }
+
+  <form [formGroup]="form" (ngSubmit)="guardar()" class="columnas">
+    <div class="ss-tarjeta datos">
+      <h2 class="ss-tarjeta-titulo">Datos generales</h2>
+
+      <div class="ss-campo">
+        <label for="nombre">Nombre</label>
+        <input id="nombre" class="ss-input" formControlName="nombre" placeholder="Ej. Semestre Saludable 2026-II" />
+        @if (invalido('nombre')) {
+          <span class="error">Ponle un nombre a la campaña.</span>
+        }
+      </div>
+
+      <div class="fila">
+        <div class="ss-campo">
+          <label for="inicio">Inicio</label>
+          <input id="inicio" class="ss-input" type="date" formControlName="fechaInicio" />
+          @if (invalido('fechaInicio')) {
+            <span class="error">Elige la fecha de inicio.</span>
+          }
+        </div>
+        <div class="ss-campo">
+          <label for="fin">Fin</label>
+          <input id="fin" class="ss-input" type="date" formControlName="fechaFin" />
+          @if (invalido('fechaFin')) {
+            <span class="error">Elige la fecha de fin.</span>
+          } @else if (fechasInvalidas()) {
+            <span class="error">Debe ser igual o posterior al inicio.</span>
+          }
+        </div>
+      </div>
+
+      <div class="ss-campo">
+        <label for="maximo">Evidencias máximas por día</label>
+        <input id="maximo" class="ss-input corto" type="number" min="1" max="50" formControlName="maxEvidenciasDia" />
+        <small>Cuántas evidencias puede enviar cada estudiante en un día.</small>
+        @if (invalido('maxEvidenciasDia')) {
+          <span class="error">Usa un número entre 1 y 50.</span>
+        }
+      </div>
+
+      <div class="ss-campo">
+        <label>Estado</label>
+        <div class="estados">
+          @for (e of estados; track e.valor) {
+            <label class="estado" [class.activo]="form.controls.estado.value === e.valor">
+              <input type="radio" formControlName="estado" [value]="e.valor" />
+              <strong>{{ e.texto }}</strong>
+              <small>{{ e.ayuda }}</small>
+            </label>
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="ss-tarjeta">
+      <div class="ss-filtros">
+        <h2 class="ss-tarjeta-titulo">Hábitos de la campaña</h2>
+        <span class="ss-badge" [class.ss-badge-info]="elegidos().size > 0" [class.ss-badge-gris]="elegidos().size === 0">
+          {{ elegidos().size }} elegidos
+        </span>
+      </div>
+      @if (intentado() && elegidos().size === 0) {
+        <p class="error">Elige al menos un hábito.</p>
+      }
+
+      @for (grupo of grupos(); track grupo.id) {
+        <fieldset class="grupo">
+          <legend>
+            <span>{{ grupo.nombre }}</span>
+            <button type="button" class="enlace" (click)="todoElGrupo(grupo)">
+              {{ cuantos(grupo) === grupo.habitos.length ? 'Quitar todos' : 'Elegir todos' }}
+            </button>
+          </legend>
+          @for (habito of grupo.habitos; track habito.id) {
+            <label class="opcion" [class.marcada]="marcado(habito)">
+              <input type="checkbox" [checked]="marcado(habito)" (change)="alternar(habito)" />
+              <span class="caja">
+                <span class="material-symbols-outlined">check</span>
+              </span>
+              <span class="opcion-texto">{{ habito.nombre }}</span>
+              <span class="opcion-pts">{{ habito.puntajeBase }} pts</span>
+            </label>
+          }
+        </fieldset>
+      } @empty {
+        <p class="ss-vacio">
+          No hay hábitos activos. <a routerLink="/campanias/habitos/nuevo">Crea uno primero</a>.
+        </p>
+      }
+    </div>
+
+    <div class="ss-form-pie pie">
+      <a class="ss-btn ss-btn-secundario" routerLink="/campanias">Cancelar</a>
+      <button type="submit" class="ss-btn ss-btn-primario" [disabled]="guardando()">
+        <span class="material-symbols-outlined">save</span>
+        {{ guardando() ? 'Guardando...' : 'Guardar campaña' }}
+      </button>
+    </div>
+  </form>
+</section>

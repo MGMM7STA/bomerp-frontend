@@ -1,0 +1,66 @@
+<section class="ss-pagina">
+  <header class="ss-cabecera">
+    <div>
+      <span class="ss-eyebrow">Configuración</span>
+      <h1 class="ss-titulo">Campañas</h1>
+      <p class="ss-descripcion">Cada campaña define sus fechas, el cupo diario y qué hábitos cuentan. Solo una puede estar activa.</p>
+    </div>
+    <a class="ss-btn ss-btn-primario" routerLink="/campanias/nueva">
+      <span class="material-symbols-outlined">add</span>
+      Nueva campaña
+    </a>
+  </header>
+
+  @if (error()) {
+    <div class="ss-aviso ss-aviso-error">
+      <span class="material-symbols-outlined">error</span>
+      <span>{{ error() }}</span>
+    </div>
+  }
+
+  <div class="ss-tarjeta">
+    <table class="ss-tabla ss-tabla-apilable">
+      <thead>
+        <tr>
+          <th>Campaña</th>
+          <th>Periodo</th>
+          <th class="num">Cupo diario</th>
+          <th class="num">Hábitos</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (campania of campanias(); track campania.id) {
+          <tr>
+            <td data-etiqueta="Campaña"><strong>{{ campania.nombre }}</strong></td>
+            <td data-etiqueta="Periodo">{{ fecha(campania.fechaInicio) | date: 'd MMM' }} – {{ fecha(campania.fechaFin) | date: 'd MMM y' }}</td>
+            <td data-etiqueta="Cupo diario" class="num">{{ campania.maxEvidenciasDia }}</td>
+            <td data-etiqueta="Hábitos" class="num">{{ campania.habitoIds.length }}</td>
+            <td data-etiqueta="Estado">
+              <span class="ss-badge" [class]="estado(campania.estado).clase">{{ estado(campania.estado).texto }}</span>
+            </td>
+            <td data-etiqueta="Acciones">
+              <div class="ss-acciones">
+                <a class="ss-btn ss-btn-secundario ss-btn-chico" [routerLink]="['/campanias', campania.id, 'editar']">
+                  <span class="material-symbols-outlined">edit</span>
+                  Editar
+                </a>
+                <button type="button" class="ss-btn ss-btn-peligro ss-btn-chico" (click)="eliminar(campania)">
+                  <span class="material-symbols-outlined">delete</span>
+                  Eliminar
+                </button>
+              </div>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="6" class="ss-vacio">
+              {{ cargando() ? 'Cargando campañas...' : 'Todavía no hay campañas.' }}
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</section>

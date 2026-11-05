@@ -1,0 +1,85 @@
+<header class="cabecera">
+  <div>
+    <span class="eyebrow">Panel de coordinación</span>
+    <h1>{{ campania()?.nombre ?? 'Semestre Saludable' }}</h1>
+    @if (campania(); as c) {
+      <p class="periodo">
+        {{ periodo() }} · <strong>quedan {{ quedan() }} días</strong> · máximo
+        {{ c.maxEvidenciasDia }} evidencias por día
+      </p>
+    }
+  </div>
+  <a routerLink="/participacion/validacion" class="btn-revisar">
+    <span class="material-symbols-outlined">fact_check</span>
+    Revisar pendientes
+    @if (porRevisar() > 0) {
+      <span class="contador">{{ porRevisar() }}</span>
+    }
+  </a>
+</header>
+
+@if (error()) {
+  <p class="ss-aviso ss-aviso-error">{{ error() }}</p>
+}
+
+<section class="kpis" [class.cargando]="cargando()">
+  <article class="kpi kpi-principal">
+    <span class="kpi-valor">{{ participantes() }}</span>
+    <span class="kpi-nombre">Participantes</span>
+    <span class="kpi-nota">estudiantes con al menos un registro</span>
+  </article>
+  <article class="kpi">
+    <span class="kpi-valor">{{ evidenciasValidas() }}</span>
+    <span class="kpi-nombre">Evidencias válidas</span>
+    <span class="kpi-nota">ya revisadas por coordinación</span>
+  </article>
+  <article class="kpi" [class.kpi-alerta]="porRevisar() > 0">
+    <span class="kpi-valor">{{ porRevisar() }}</span>
+    <span class="kpi-nombre">Por revisar</span>
+    <span class="kpi-nota">registros enviados sin validar</span>
+  </article>
+  <article class="kpi">
+    <span class="kpi-valor">{{ promedio() | number: '1.1-1' }}</span>
+    <span class="kpi-nombre">Promedio por persona</span>
+    <span class="kpi-nota">evidencias válidas por participante</span>
+  </article>
+</section>
+
+<section class="graficos">
+  <article class="tarjeta">
+    <h2>Evidencias por día</h2>
+    <p class="subtitulo">Últimos 7 días</p>
+    <div class="barras-verticales">
+      @for (barra of porDia(); track barra.etiqueta) {
+        <div class="columna">
+          <span class="columna-valor">{{ barra.valor }}</span>
+          <div class="columna-pista">
+            <div class="columna-relleno" [style.height.%]="barra.porcentaje"></div>
+          </div>
+          <span class="columna-etiqueta">{{ barra.etiqueta }}</span>
+        </div>
+      }
+    </div>
+  </article>
+
+  <article class="tarjeta">
+    <h2>Por hábito</h2>
+    <p class="subtitulo">Evidencias validadas</p>
+    @if (porHabito().length === 0) {
+      <p class="vacio">Todavía no hay evidencias validadas.</p>
+    }
+    <ul class="barras-horizontales">
+      @for (barra of porHabito(); track barra.etiqueta) {
+        <li>
+          <div class="fila">
+            <span>{{ barra.etiqueta }}</span>
+            <strong>{{ barra.valor }}</strong>
+          </div>
+          <div class="pista">
+            <div class="relleno" [style.width.%]="barra.porcentaje"></div>
+          </div>
+        </li>
+      }
+    </ul>
+  </article>
+</section>

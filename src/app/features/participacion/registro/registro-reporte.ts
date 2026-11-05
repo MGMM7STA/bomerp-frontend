@@ -5,15 +5,24 @@ import { RouterLink } from '@angular/router';
 import { RegistroService } from './registro-service';
 import { RegistroResponse } from './registro.model';
 import { AuthService } from '../../../core/auth/auth-service';
+import { EstudianteService } from '../estudiante/estudiante-service';
+import { Estudiante } from '../estudiante/estudiante.model';
+import { ConfirmacionService } from '../../../shared/confirmacion/confirmacion';
+import { estiloEstado } from '../../../shared/utilidades/estados';
 
 @Component({
   selector: 'app-registro-reporte',
   imports: [DatePipe, DecimalPipe, RouterLink],
   templateUrl: './registro-reporte.html',
+  styleUrl: './registro-reporte.css',
 })
 export class RegistroReporteComponent implements OnInit {
   private readonly registroService = inject(RegistroService);
   protected readonly auth = inject(AuthService);
+  private readonly estudianteService = inject(EstudianteService);
+  private readonly confirmacion = inject(ConfirmacionService);
+  protected readonly estilo = estiloEstado;
+  protected readonly estudiantes = signal<Map<number, Estudiante>>(new Map());
 
   protected readonly registros = signal<RegistroResponse[]>([]);
   protected readonly estadoFiltro = signal('');
@@ -30,7 +39,9 @@ export class RegistroReporteComponent implements OnInit {
   );
 
   protected readonly puntajeAcumulado = computed(() =>
-    this.registros().reduce((suma, r) => suma + r.puntajeTotal, 0),
+    this.registros()
+      .filter((r) => r.estado === 'VALIDADO')
+      .reduce((suma, r) => suma + Number(r.puntajeTotal), 0),
   );
 
   protected readonly puntajePromedio = computed(() =>
@@ -56,6 +67,9 @@ export class RegistroReporteComponent implements OnInit {
   });
 
   ngOnInit(): void {
+    this.estudianteService.listar().subscribe({
+      next: (data) => this.estudiantes.set(new Map(data.map((e) => [e.id, e]))),
+    });
     this.cargar();
   }
 
@@ -68,7 +82,10 @@ export class RegistroReporteComponent implements OnInit {
       .buscar(this.estadoFiltro() || undefined, undefined, desde, hasta)
       .subscribe({
         next: (data) => this.registros.set(data),
-        error: () => this.error.set('No se pudo cargar el reporte de participacion.'),
+        error: () => {
+          this.error.set('No se pudo cargar el reporte de participación.');
+          this.loading.set(false);
+        },
         complete: () => this.loading.set(false),
       });
   }
@@ -98,14 +115,25 @@ export class RegistroReporteComponent implements OnInit {
     this.cargar();
   }
 
-  protected anular(registro: RegistroResponse): void {
-    const resumen =
-      `Vas a anular el registro ${registro.id} del estudiante ${registro.estudianteId}\n\n` +
-      `Evidencias: ${registro.totalEvidencias}\n` +
-      `Puntaje: ${registro.puntajeTotal.toFixed(2)} pts\n\n` +
-      `Se devolvera el cupo diario consumido por sus evidencias. Esta accion no se puede deshacer. Confirmar?`;
-    if (!confirm(resumen)) return;
+  protected nombre(registro: RegistroResponse): string {
+    return this.estudiantes().get(registro.estudianteId)?.nombre ?? `Estudiante #${registro.estudianteId}`;
+  }
 
+  protected anular(registro: RegistroResponse): void {
+    this.confirmacion
+      .preguntar({
+        titulo: `Anular registro #${registro.id}`,
+        mensaje: `Es de ${this.nombre(registro)}, con ${registro.totalEvidencias} evidencias. Se le devuelve el cupo de ese día y no se puede deshacer.`,
+        aceptar: 'Anular registro',
+        icono: 'block',
+        peligro: true,
+      })
+      .subscribe((si) => {
+        if (si) this.confirmarAnulacion(registro);
+      });
+  }
+
+  private confirmarAnulacion(registro: RegistroResponse): void {
     this.error.set(null);
     this.aviso.set(null);
     this.registroService.anular(registro.id).subscribe({
@@ -126,7 +154,7 @@ export class RegistroReporteComponent implements OnInit {
       this.error.set(mensaje || `El registro ${id} ya estaba anulado, no se puede anular dos veces.`);
     } else if (err.status === 404 && mensaje.includes('cupo diario')) {
       this.error.set(
-        `El registro ${id} no tiene un cupo diario asociado, asi que no hay nada que devolver.`,
+        `El registro ${id} no tiene un cupo diario asociado, así que no hay nada que devolver.`,
       );
     } else if (err.status === 404) {
       this.error.set(`El registro ${id} ya no existe.`);

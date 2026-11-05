@@ -2,7 +2,6 @@ import { Component, inject, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
@@ -17,7 +16,6 @@ import { MensajeError } from '../../../shared/mensaje-error/mensaje-error';
     ReactiveFormsModule,
     RouterLink,
     MensajeError,
-    MatButtonModule,
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,

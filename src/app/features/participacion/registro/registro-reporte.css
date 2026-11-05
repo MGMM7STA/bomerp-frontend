@@ -1,0 +1,20 @@
+.registro-cabecera {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-bottom: 0.75rem;
+}
+
+.registro-cabecera strong {
+  color: var(--ss-navy);
+}
+
+.espacio {
+  flex: 1;
+}
+
+.ss-stat-valor.habito {
+  font-size: 1rem;
+  line-height: 1.6;
+}

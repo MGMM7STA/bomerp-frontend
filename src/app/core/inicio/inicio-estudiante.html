@@ -1,0 +1,99 @@
+@if (sinCampania()) {
+  <section class="ss-tarjeta vacio">
+    <span class="material-symbols-outlined vacio-icono">event_busy</span>
+    <h1>Hola, {{ primerNombre() }}</h1>
+    <p>Ahora mismo no hay una campaña activa. Cuando coordinación abra la próxima, la vas a ver aquí.</p>
+  </section>
+} @else {
+  <header class="saludo">
+    <span class="ss-eyebrow">{{ campania()?.nombre }} · quedan {{ quedan() }} días</span>
+    <h1>Hola, {{ primerNombre() }}</h1>
+  </header>
+
+  <section class="hoy">
+    <div class="hoy-datos">
+      <span class="hoy-titulo">Tu cupo de hoy</span>
+      <p class="hoy-numero">
+        <strong>{{ usadasHoy() }}</strong> de {{ maximo() }} evidencias
+      </p>
+      <div class="barra" role="progressbar" [attr.aria-valuenow]="usadasHoy()" [attr.aria-valuemax]="maximo()">
+        <div class="barra-relleno" [style.width.%]="avanceHoy()"></div>
+      </div>
+      <p class="hoy-nota">
+        @if (restantesHoy() > 0) {
+          Te quedan {{ restantesHoy() }} por registrar hoy.
+        } @else {
+          Llegaste al máximo de hoy. Mañana se renueva.
+        }
+      </p>
+    </div>
+    @if (restantesHoy() > 0) {
+      <a routerLink="/participacion/registrar" class="ss-btn ss-btn-exito hoy-boton">
+        <span class="material-symbols-outlined">add_task</span>
+        Registrar participación
+      </a>
+    }
+  </section>
+
+  <section class="numeros">
+    <article class="numero">
+      <span class="numero-icono validado material-symbols-outlined">verified</span>
+      <span class="numero-valor">{{ puntosValidados() | number: '1.0-1' }}</span>
+      <span class="numero-nombre">puntos validados</span>
+    </article>
+    <article class="numero">
+      <span class="numero-icono pendiente material-symbols-outlined">schedule</span>
+      <span class="numero-valor">{{ puntosPendientes() | number: '1.0-1' }}</span>
+      <span class="numero-nombre">puntos por validar</span>
+    </article>
+    <article class="numero">
+      <span class="numero-icono dias material-symbols-outlined">calendar_month</span>
+      <span class="numero-valor">{{ diasActivos() }}</span>
+      <span class="numero-nombre">días con actividad</span>
+    </article>
+  </section>
+
+  <div class="columnas">
+    <section>
+      <h2 class="seccion-titulo">Hábitos de esta campaña</h2>
+      <div class="habitos">
+        @for (habito of habitos(); track habito.id) {
+          <article class="habito">
+            <div class="habito-cabecera">
+              <h3>{{ habito.nombre }}</h3>
+              <span class="habito-puntaje">+{{ habito.puntajeBase }}</span>
+            </div>
+            @if (habito.descripcion) {
+              <p>{{ habito.descripcion }}</p>
+            }
+            <span class="ss-etiqueta">{{ habito.categoria.nombre }}</span>
+          </article>
+        } @empty {
+          <p class="ss-descripcion">Todavía no hay hábitos asignados a esta campaña.</p>
+        }
+      </div>
+    </section>
+
+    <section>
+      <div class="seccion-cabecera">
+        <h2 class="seccion-titulo">Tus últimos registros</h2>
+        <a routerLink="/participacion/mis-registros" class="ver-todos">Ver todos</a>
+      </div>
+      <ul class="recientes">
+        @for (registro of recientes(); track registro.id) {
+          <li>
+            <div>
+              <strong>{{ registro.fecha | date: "EEE d 'de' MMM, HH:mm" }}</strong>
+              <span>{{ registro.totalEvidencias }} {{ registro.totalEvidencias === 1 ? 'evidencia' : 'evidencias' }} · {{ registro.puntajeTotal | number: '1.0-2' }} pts</span>
+            </div>
+            <span class="ss-badge" [class]="'ss-badge ' + estilo(registro.estado).clase">
+              {{ estilo(registro.estado).texto }}
+            </span>
+          </li>
+        } @empty {
+          <li class="vacio-lista">Aún no registraste nada. Tu primer hábito suma desde hoy.</li>
+        }
+      </ul>
+    </section>
+  </div>
+}

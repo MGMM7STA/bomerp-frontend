@@ -1,45 +1,83 @@
-<header class="header">
-  <h1>
-    <a routerLink="/" class="home-link">
-      <img src="favicon.ico" alt="" height="30" />
+<header class="topbar">
+  <div class="topbar-izquierda">
+    @if (auth.autenticado()) {
+      <button type="button" class="boton-menu" (click)="alternarMenu()" aria-label="Abrir menú">
+        <span class="material-symbols-outlined">{{ menuAbierto() ? 'close' : 'menu' }}</span>
+      </button>
+    }
+    <a routerLink="/" class="marca">
+      <img src="logo-blanco.png" alt="Universidad Saludable" />
+      <span class="marca-texto">Semestre Saludable</span>
     </a>
-    BomERP
-  </h1>
+  </div>
 
-  @if (auth.autenticado()) {
-    <span class="user">{{ auth.usuario()?.nombre }}</span>
-    <button type="button" (click)="auth.cerrarSesion()">Cerrar sesion</button>
-  } @else {
-    <button type="button" (click)="auth.iniciarLogin()">Iniciar sesion</button>
-  }
+  <div class="topbar-derecha">
+    @if (auth.autenticado()) {
+      <div class="usuario">
+        <span class="avatar">{{ iniciales() }}</span>
+        <span class="usuario-datos">
+          <span class="usuario-nombre">{{ auth.usuario()?.nombre }}</span>
+          <span class="usuario-rol">{{ nombreRol() }}</span>
+        </span>
+      </div>
+      <button type="button" class="boton-salir" (click)="auth.cerrarSesion()" aria-label="Cerrar sesión">
+        <span class="material-symbols-outlined">logout</span>
+        <span class="boton-salir-texto">Salir</span>
+      </button>
+    } @else {
+      <button type="button" class="boton-entrar" (click)="auth.iniciarLogin()">Iniciar sesión</button>
+    }
+  </div>
 </header>
 
-<div class="body">
+<div class="shell" [class.con-menu]="auth.autenticado()">
   @if (auth.autenticado()) {
-    <aside class="sidebar">
+    <aside class="sidebar" [class.abierto]="menuAbierto()">
       <nav>
-        <a routerLink="/catalogo/categorias" routerLinkActive="active">Categorias</a>
-        <a routerLink="/campanias/categorias-habito" routerLinkActive="active">Categorias de habito</a>
-        <a routerLink="/catalogo/productos" routerLinkActive="active">Productos</a>
-        <a routerLink="/campanias/habitos" routerLinkActive="active">Habitos</a>
-        @if (auth.tieneRol('VENDEDOR', 'SUPERVISOR')) {
-          <a routerLink="/ventas/nueva" routerLinkActive="active">Nueva venta</a>
-        }
-        <a routerLink="/ventas/reporte" routerLinkActive="active">Reporte de ventas</a>
-        @if (auth.tieneRol('ESTUDIANTE', 'COORDINADOR')) {
-          <a routerLink="/participacion/nuevo" routerLinkActive="active">Nueva participacion</a>
-        }
-        <a routerLink="/participacion/reporte" routerLinkActive="active">Reporte de participacion</a>
-        <a routerLink="/premios/categorias" routerLinkActive="active">Categorias de premio</a>
-        <a routerLink="/premios/catalogo" routerLinkActive="active">Premios</a>
-        @if (auth.tieneRol('COORDINADOR', 'ADMIN')) {
-          <a routerLink="/premios/actas" routerLinkActive="active">Actas de premiacion</a>
+        @for (grupo of grupos(); track grupo.titulo) {
+          @if (grupo.titulo) {
+            <p class="grupo">{{ grupo.titulo }}</p>
+          }
+          @for (item of grupo.items; track item.ruta) {
+            <a
+              [routerLink]="item.ruta"
+              routerLinkActive="activo"
+              [routerLinkActiveOptions]="{ exact: !!item.exacto }"
+            >
+              <span class="material-symbols-outlined">{{ item.icono }}</span>
+              {{ item.texto }}
+            </a>
+          }
         }
       </nav>
     </aside>
+    @if (menuAbierto()) {
+      <div class="velo" (click)="alternarMenu()"></div>
+    }
   }
 
-  <main class="content">
+  <main class="contenido">
     <router-outlet />
   </main>
 </div>
+
+@if (auth.autenticado()) {
+  <nav class="barra-movil">
+    @for (item of barraMovil(); track item.ruta) {
+      <a
+        [routerLink]="item.ruta"
+        routerLinkActive="activo"
+        [routerLinkActiveOptions]="{ exact: !!item.exacto }"
+      >
+        <span class="material-symbols-outlined">{{ item.icono }}</span>
+        <span>{{ item.corto ?? item.texto }}</span>
+      </a>
+    }
+    @if (hayMas()) {
+      <button type="button" (click)="alternarMenu()">
+        <span class="material-symbols-outlined">apps</span>
+        <span>Más</span>
+      </button>
+    }
+  </nav>
+}

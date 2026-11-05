@@ -1,92 +1,128 @@
-<h2>Reporte de participacion</h2>
+<section class="ss-pagina">
+  <header class="ss-cabecera">
+    <div>
+      <span class="ss-eyebrow">Seguimiento</span>
+      <h1 class="ss-titulo">Reporte de participación</h1>
+      <p class="ss-descripcion">Cada registro agrupa las evidencias de un estudiante en un día.</p>
+    </div>
+    <a class="ss-btn ss-btn-primario" routerLink="/participacion/validacion">
+      <span class="material-symbols-outlined">fact_check</span>
+      Validar evidencias
+    </a>
+  </header>
 
-@if (error()) {
-  <p class="error">{{ error() }}</p>
-}
-@if (aviso()) {
-  <p class="aviso">{{ aviso() }}</p>
-}
+  @if (error()) {
+    <p class="ss-aviso ss-aviso-error">{{ error() }}</p>
+  }
+  @if (aviso()) {
+    <p class="ss-aviso ss-aviso-ok">{{ aviso() }}</p>
+  }
 
-<section class="agregados">
-  <p><strong>Registros:</strong> {{ totalRegistros() }}</p>
-  <p><strong>Evidencias totales:</strong> {{ evidenciasTotales() }}</p>
-  <p><strong>Puntaje acumulado:</strong> {{ puntajeAcumulado() | number: '1.2-2' }} pts</p>
-  <p><strong>Puntaje promedio por registro:</strong> {{ puntajePromedio() | number: '1.2-2' }} pts</p>
-  <p><strong>Habito mas registrado:</strong> {{ habitoMasRegistrado() }}</p>
-</section>
+  <section class="ss-stats">
+    <div class="ss-stat">
+      <span class="ss-stat-valor">{{ totalRegistros() }}</span>
+      <span class="ss-stat-nombre">Registros</span>
+    </div>
+    <div class="ss-stat">
+      <span class="ss-stat-valor">{{ evidenciasTotales() }}</span>
+      <span class="ss-stat-nombre">Evidencias</span>
+    </div>
+    <div class="ss-stat">
+      <span class="ss-stat-valor">{{ puntajeAcumulado() | number: '1.0-2' }}</span>
+      <span class="ss-stat-nombre">Puntaje validado</span>
+    </div>
+    <div class="ss-stat">
+      <span class="ss-stat-valor">{{ puntajePromedio() | number: '1.2-2' }}</span>
+      <span class="ss-stat-nombre">Promedio por registro</span>
+    </div>
+    <div class="ss-stat">
+      <span class="ss-stat-valor habito">{{ habitoMasRegistrado() }}</span>
+      <span class="ss-stat-nombre">Hábito más registrado</span>
+    </div>
+  </section>
 
-<section class="filtros">
-  <p>
-    <strong>Estado:</strong>
-    <button type="button" (click)="filtrarPorEstado('')">Todos</button>
-    <button type="button" (click)="filtrarPorEstado('ENVIADO')">Enviados</button>
-    <button type="button" (click)="filtrarPorEstado('VALIDADO')">Validados</button>
-    <button type="button" (click)="filtrarPorEstado('ANULADO')">Anulados</button>
-  </p>
+  <div class="ss-tarjeta">
+    <div class="ss-filtros">
+      <div class="ss-chips">
+        <button type="button" class="ss-chip" [class.activo]="estadoFiltro() === ''" (click)="filtrarPorEstado('')">Todos</button>
+        <button type="button" class="ss-chip" [class.activo]="estadoFiltro() === 'ENVIADO'" (click)="filtrarPorEstado('ENVIADO')">Por revisar</button>
+        <button type="button" class="ss-chip" [class.activo]="estadoFiltro() === 'VALIDADO'" (click)="filtrarPorEstado('VALIDADO')">Validados</button>
+        <button type="button" class="ss-chip" [class.activo]="estadoFiltro() === 'RECHAZADO'" (click)="filtrarPorEstado('RECHAZADO')">Rechazados</button>
+        <button type="button" class="ss-chip" [class.activo]="estadoFiltro() === 'ANULADO'" (click)="filtrarPorEstado('ANULADO')">Anulados</button>
+      </div>
+      <div class="ss-chips">
+        <label for="desde">Desde</label>
+        <input id="desde" class="ss-input" type="date" #desde />
+        <label for="hasta">Hasta</label>
+        <input id="hasta" class="ss-input" type="date" #hasta />
+        <button type="button" class="ss-btn ss-btn-secundario ss-btn-chico" (click)="aplicarRangoFechas(desde.value, hasta.value)">Aplicar</button>
+        <button type="button" class="ss-btn ss-btn-secundario ss-btn-chico" (click)="desde.value = ''; hasta.value = ''; limpiarFiltros()">
+          Limpiar
+        </button>
+      </div>
+    </div>
+  </div>
 
-  <p>
-    <strong>Rango de fechas:</strong>
-    <input type="date" #desde />
-    <input type="date" #hasta />
-    <button type="button" (click)="aplicarRangoFechas(desde.value, hasta.value)">Aplicar</button>
-    <button type="button" (click)="desde.value = ''; hasta.value = ''; limpiarFiltros()">
-      Limpiar filtros
-    </button>
-  </p>
-</section>
+  @if (loading()) {
+    <p class="ss-vacio">Cargando...</p>
+  }
 
-@if (loading()) {
-  <p>Cargando...</p>
-}
+  @if (!loading() && registros().length === 0) {
+    <p class="ss-vacio">No hay registros para los filtros aplicados.</p>
+  }
 
-@if (!loading() && registros().length === 0) {
-  <p>No hay registros para los filtros aplicados.</p>
-}
-
-@for (registro of registros(); track registro.id) {
-  <article class="registro">
-    <header>
-      <strong>Registro {{ registro.id }}</strong>
-      — Estudiante {{ registro.estudianteId }}
-      — {{ registro.fecha | date: 'dd/MM/yyyy HH:mm' }}
-      — <span class="estado">{{ registro.estado }}</span>
-      @if (registro.estado !== 'ANULADO' && auth.tieneRol('COORDINADOR', 'ADMIN')) {
-        <button type="button" (click)="anular(registro)">Anular</button>
-      }
-    </header>
-
-    <table>
-      <thead>
-        <tr>
-          <th>Habito</th>
-          <th>Descripcion</th>
-          <th>Puntaje unitario</th>
-          <th>Veces</th>
-          <th>Subtotal</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (detalle of registro.detalles; track $index) {
-          <tr>
-            <td>{{ detalle.nombreHabito }}</td>
-            <td>{{ detalle.descripcion || '-' }}</td>
-            <td>{{ detalle.puntajeUnitario | number: '1.2-2' }} pts</td>
-            <td>{{ detalle.veces }}</td>
-            <td>{{ detalle.subtotal | number: '1.2-2' }} pts</td>
-          </tr>
+  @for (registro of registros(); track registro.id) {
+    <article class="ss-tarjeta registro">
+      <header class="registro-cabecera">
+        <span class="ss-id">#{{ registro.id }}</span>
+        <strong>{{ nombre(registro) }}</strong>
+        <span class="ss-descripcion">{{ registro.fecha | date: 'dd/MM/yyyy HH:mm' }}</span>
+        <span class="ss-badge" [class]="estilo(registro.estado).clase">{{ estilo(registro.estado).texto }}</span>
+        <span class="espacio"></span>
+        @if (registro.estado !== 'ANULADO' && auth.tieneRol('COORDINADOR', 'ADMIN')) {
+          <button type="button" class="ss-btn ss-btn-peligro ss-btn-chico" (click)="anular(registro)">
+            <span class="material-symbols-outlined">block</span>
+            Anular
+          </button>
         }
-      </tbody>
-      <tfoot>
-        <tr>
-          <td colspan="3">Total del registro</td>
-          <td>{{ registro.totalEvidencias }}</td>
-          <td>{{ registro.puntajeTotal | number: '1.2-2' }} pts</td>
-        </tr>
-      </tfoot>
-    </table>
-  </article>
-}
+      </header>
 
-<p>
-  <a routerLink="/participacion/nuevo">Registrar nueva participacion</a>
-</p>
+      @if (registro.estado === 'RECHAZADO' && registro.motivoRechazo) {
+        <div class="ss-aviso ss-aviso-error">
+          <span class="material-symbols-outlined">feedback</span>
+          <span><strong>Motivo:</strong> {{ registro.motivoRechazo }}</span>
+        </div>
+      }
+
+      <table class="ss-tabla">
+        <thead>
+          <tr>
+            <th>Hábito</th>
+            <th>Descripción</th>
+            <th class="num">Puntaje</th>
+            <th class="num">Veces</th>
+            <th class="num">Subtotal</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (detalle of registro.detalles; track $index) {
+            <tr>
+              <td>{{ detalle.nombreHabito }}</td>
+              <td>{{ detalle.descripcion || '—' }}</td>
+              <td class="num">{{ detalle.puntajeUnitario | number: '1.2-2' }} pts</td>
+              <td class="num">{{ detalle.veces }}</td>
+              <td class="num">{{ detalle.subtotal | number: '1.2-2' }} pts</td>
+            </tr>
+          }
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="3">Total del registro</td>
+            <td class="num">{{ registro.totalEvidencias }}</td>
+            <td class="num">{{ registro.puntajeTotal | number: '1.2-2' }} pts</td>
+          </tr>
+        </tfoot>
+      </table>
+    </article>
+  }
+</section>

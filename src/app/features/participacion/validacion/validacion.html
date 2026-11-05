@@ -1,0 +1,129 @@
+<section class="ss-pagina">
+  <header class="ss-cabecera">
+    <div>
+      <span class="ss-eyebrow">Seguimiento</span>
+      <h1 class="ss-titulo">Validar evidencias</h1>
+      <p class="ss-descripcion">Los registros llegan en orden: el más antiguo primero.</p>
+    </div>
+    <button type="button" class="ss-btn ss-btn-secundario" (click)="cargar()" [disabled]="cargando()">
+      <span class="material-symbols-outlined">refresh</span>
+      Actualizar
+    </button>
+  </header>
+
+  @if (aviso(); as a) {
+    <div class="ss-aviso" [class.ss-aviso-ok]="a.tipo === 'ok'" [class.ss-aviso-error]="a.tipo === 'error'">
+      <span class="material-symbols-outlined">{{ a.tipo === 'ok' ? 'check_circle' : 'error' }}</span>
+      <span>{{ a.texto }}</span>
+    </div>
+  }
+
+  <div class="ss-stats">
+    <div class="ss-stat">
+      <span class="ss-stat-valor">{{ pendientes().length }}</span>
+      <span class="ss-stat-nombre">Registros por revisar</span>
+    </div>
+    <div class="ss-stat">
+      <span class="ss-stat-valor">{{ evidencias() }}</span>
+      <span class="ss-stat-nombre">Evidencias</span>
+    </div>
+    <div class="ss-stat">
+      <span class="ss-stat-valor">{{ conFoto() }}</span>
+      <span class="ss-stat-nombre">Con foto</span>
+    </div>
+    <div class="ss-stat">
+      <span class="ss-stat-valor">{{ revisadosHoy() }}</span>
+      <span class="ss-stat-nombre">Revisados ahora</span>
+    </div>
+  </div>
+
+  @if (cargando() && pendientes().length === 0) {
+    <div class="ss-tarjeta ss-vacio">Cargando pendientes...</div>
+  } @else {
+    @for (registro of pendientes(); track registro.id) {
+      <article class="ss-tarjeta pendiente" [class.ocupado]="ocupado() === registro.id">
+        <header>
+          <span class="avatar">{{ iniciales(registro) }}</span>
+          <div class="quien">
+            <strong>{{ nombre(registro) }}</strong>
+            <span>{{ correo(registro) }}</span>
+          </div>
+          <div class="cuando">
+            <span>{{ registro.fecha | date: "d 'de' MMM, HH:mm" }}</span>
+            <strong>{{ registro.puntajeTotal | number: '1.0-2' }} pts</strong>
+          </div>
+        </header>
+
+        <ul class="evidencias">
+          @for (detalle of registro.detalles; track detalle.habitoId) {
+            <li>
+              <div class="evidencia-texto">
+                <span class="habito">{{ detalle.nombreHabito }} <span class="veces">×{{ detalle.veces }}</span></span>
+                <span class="descripcion">{{ detalle.descripcion || 'Sin descripción' }}</span>
+              </div>
+              @if (detalle.urlImagen) {
+                <a class="ss-btn ss-btn-secundario ss-btn-chico" [href]="detalle.urlImagen" target="_blank" rel="noopener">
+                  <span class="material-symbols-outlined">image</span>
+                  Ver foto
+                </a>
+              } @else {
+                <span class="sin-foto">Sin foto</span>
+              }
+            </li>
+          }
+        </ul>
+
+        @if (rechazando() === registro.id) {
+          <div class="rechazo">
+            <label class="ss-stat-nombre" [attr.for]="'motivo-' + registro.id">Motivo del rechazo</label>
+            <textarea
+              class="ss-input"
+              [id]="'motivo-' + registro.id"
+              rows="2"
+              maxlength="250"
+              placeholder="Ej. La foto no muestra la actividad"
+              [value]="motivo()"
+              (input)="escribirMotivo($event)"></textarea>
+            <small>El estudiante verá este mensaje. Mínimo 5 caracteres.</small>
+            <div class="ss-acciones">
+              <button type="button" class="ss-btn ss-btn-secundario" (click)="cancelarRechazo()">Cancelar</button>
+              <button
+                type="button"
+                class="ss-btn ss-btn-peligro-lleno"
+                (click)="rechazar(registro)"
+                [disabled]="motivo().trim().length < 5 || ocupado() === registro.id">
+                <span class="material-symbols-outlined">block</span>
+                Confirmar rechazo
+              </button>
+            </div>
+          </div>
+        } @else {
+          <footer class="ss-acciones">
+            <button
+              type="button"
+              class="ss-btn ss-btn-peligro"
+              (click)="abrirRechazo(registro)"
+              [disabled]="ocupado() !== null">
+              <span class="material-symbols-outlined">close</span>
+              Rechazar
+            </button>
+            <button
+              type="button"
+              class="ss-btn ss-btn-exito"
+              (click)="validar(registro)"
+              [disabled]="ocupado() !== null">
+              <span class="material-symbols-outlined">check</span>
+              Validar
+            </button>
+          </footer>
+        }
+      </article>
+    } @empty {
+      <div class="ss-tarjeta vacio">
+        <span class="material-symbols-outlined">verified</span>
+        <h2>Todo al día</h2>
+        <p>No hay registros esperando revisión.</p>
+      </div>
+    }
+  }
+</section>

@@ -33,4 +33,14 @@ export class RegistroService {
   anular(id: number): Observable<RegistroResponse> {
     return this.http.patch<RegistroResponse>(this.api.buildUrl(`${this.resource}/${id}/anular`), {});
   }
+
+  validar(id: number): Observable<RegistroResponse> {
+    return this.http.patch<RegistroResponse>(this.api.buildUrl(`${this.resource}/${id}/validar`), {});
+  }
+
+  rechazar(id: number, motivo: string): Observable<RegistroResponse> {
+    return this.http.patch<RegistroResponse>(this.api.buildUrl(`${this.resource}/${id}/rechazar`), {
+      motivo,
+    });
+  }
 }

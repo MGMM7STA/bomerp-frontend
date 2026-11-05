@@ -1,0 +1,90 @@
+<section class="ss-pagina">
+  <header class="ss-cabecera">
+    <div>
+      <span class="ss-eyebrow">Mi participación</span>
+      <h1 class="ss-titulo">Mis registros</h1>
+      <p class="ss-descripcion">Todo lo que enviaste y en qué va cada uno.</p>
+    </div>
+    <a class="ss-btn ss-btn-primario" routerLink="/participacion/registrar">
+      <span class="material-symbols-outlined">add_task</span>
+      Registrar participación
+    </a>
+  </header>
+
+  @if (error()) {
+    <div class="ss-aviso ss-aviso-error">
+      <span class="material-symbols-outlined">error</span>
+      <span>{{ error() }}</span>
+    </div>
+  }
+
+  <div class="ss-stats">
+    <div class="ss-stat">
+      <span class="ss-stat-valor">{{ puntosValidados() | number: '1.0-2' }}</span>
+      <span class="ss-stat-nombre">Puntos validados</span>
+    </div>
+    <div class="ss-stat">
+      <span class="ss-stat-valor">{{ total('ENVIADO') }}</span>
+      <span class="ss-stat-nombre">Por validar</span>
+    </div>
+    <div class="ss-stat">
+      <span class="ss-stat-valor">{{ total(null) }}</span>
+      <span class="ss-stat-nombre">Registros</span>
+    </div>
+  </div>
+
+  <div class="ss-chips filtros">
+    @for (f of filtros; track f.texto) {
+      <button type="button" class="ss-chip" [class.activo]="filtro() === f.estado" (click)="filtro.set(f.estado)">
+        {{ f.texto }} <span class="cuenta">{{ total(f.estado) }}</span>
+      </button>
+    }
+  </div>
+
+  @if (cargando()) {
+    <div class="ss-tarjeta ss-vacio">Cargando tus registros...</div>
+  } @else {
+    <div class="lista">
+      @for (registro of visibles(); track registro.id) {
+        <article class="ss-tarjeta registro">
+          <header>
+            <div>
+              <span class="fecha">{{ registro.fecha | date: "EEEE d 'de' MMMM, HH:mm" }}</span>
+              <strong class="puntaje">{{ registro.puntajeTotal | number: '1.0-2' }} pts</strong>
+            </div>
+            <span class="ss-badge" [class]="estilo(registro.estado).clase">
+              <span class="material-symbols-outlined">{{ estilo(registro.estado).icono }}</span>
+              {{ estilo(registro.estado).texto }}
+            </span>
+          </header>
+
+          <ul class="detalles">
+            @for (detalle of registro.detalles; track detalle.habitoId) {
+              <li>
+                <span class="nombre">{{ detalle.nombreHabito }}</span>
+                <span class="veces">×{{ detalle.veces }}</span>
+                @if (detalle.urlImagen) {
+                  <a [href]="detalle.urlImagen" target="_blank" rel="noopener" class="foto" aria-label="Ver foto">
+                    <span class="material-symbols-outlined">image</span>
+                  </a>
+                }
+              </li>
+            }
+          </ul>
+
+          @if (registro.estado === 'RECHAZADO') {
+            <div class="ss-aviso ss-aviso-error motivo">
+              <span class="material-symbols-outlined">feedback</span>
+              <span><strong>Motivo:</strong> {{ registro.motivoRechazo || 'Sin detalle' }}</span>
+            </div>
+          }
+        </article>
+      } @empty {
+        <div class="ss-tarjeta vacio">
+          <span class="material-symbols-outlined">inbox</span>
+          <p>{{ filtro() === null ? 'Todavía no registraste nada.' : 'No tienes registros en este estado.' }}</p>
+        </div>
+      }
+    </div>
+  }
+</section>

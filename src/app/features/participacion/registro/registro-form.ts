@@ -1,177 +1,204 @@
 import { DecimalPipe } from '@angular/common';
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { Router } from '@angular/router';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { HabitoService } from '../../campanias/habito/habito-service';
+import { RouterLink } from '@angular/router';
+import { CampaniaService } from '../../campanias/campania/campania-service';
+import { Campania } from '../../campanias/campania/campania.model';
 import { Habito } from '../../campanias/habito/habito.model';
+import { consumeCupo } from '../../../shared/utilidades/estados';
+import { mensajeDeError } from '../../../shared/utilidades/errores';
+import { claveDia } from '../../../core/inicio/fechas';
 import { RegistroService } from './registro-service';
+import { RegistroResponse } from './registro.model';
+
+interface Linea {
+  habito: Habito;
+  veces: number;
+  descripcion: string;
+  urlImagen: string;
+}
+
+type Paso = 1 | 2 | 3;
 
 @Component({
   selector: 'app-registro-form',
-  imports: [
-    ReactiveFormsModule,
-    DecimalPipe,
-    MatAutocompleteModule,
-    MatFormFieldModule,
-    MatInputModule,
-  ],
+  imports: [RouterLink, DecimalPipe],
   templateUrl: './registro-form.html',
+  styleUrl: './registro-form.css',
 })
-export class RegistroForm {
-  private readonly fb = inject(FormBuilder);
-  private readonly habitoService = inject(HabitoService);
+export class RegistroForm implements OnInit {
+  private readonly campaniaService = inject(CampaniaService);
   private readonly registroService = inject(RegistroService);
-  private readonly router = inject(Router);
 
+  protected readonly pasos = [
+    { numero: 1, texto: 'Hábitos' },
+    { numero: 2, texto: 'Detalle' },
+    { numero: 3, texto: 'Confirmar' },
+  ];
+
+  protected readonly campania = signal<Campania | null>(null);
   protected readonly habitos = signal<Habito[]>([]);
+  protected readonly registros = signal<RegistroResponse[]>([]);
+  protected readonly cargando = signal(true);
+  protected readonly sinCampania = signal(false);
+  protected readonly paso = signal<Paso>(1);
+  protected readonly lineas = signal<Linea[]>([]);
+  protected readonly categoriaFiltro = signal<number | null>(null);
   protected readonly error = signal<string | null>(null);
-  protected readonly loading = signal(false);
+  protected readonly enviando = signal(false);
+  protected readonly creado = signal<RegistroResponse | null>(null);
 
-  protected readonly form = this.fb.nonNullable.group({
-    estudianteId: [1, [Validators.required, Validators.min(1)]],
-    detalles: this.fb.array([this.crearLinea()], [Validators.minLength(1)]),
+  protected readonly categorias = computed(() => {
+    const vistas = new Map<number, string>();
+    for (const habito of this.habitos()) {
+      vistas.set(habito.categoria.id, habito.categoria.nombre);
+    }
+    return [...vistas].map(([id, nombre]) => ({ id, nombre }));
   });
 
-  protected readonly valoresDetalles = toSignal(this.form.controls.detalles.valueChanges, {
-    initialValue: this.form.controls.detalles.getRawValue(),
+  protected readonly habitosVisibles = computed(() => {
+    const filtro = this.categoriaFiltro();
+    return filtro === null
+      ? this.habitos()
+      : this.habitos().filter((habito) => habito.categoria.id === filtro);
   });
 
-  protected readonly puntajesUnitarios = computed(() =>
-    this.valoresDetalles().map((linea) => {
-      const habito = this.habitos().find((h) => h.id === linea.habitoId);
-      return habito?.puntajeBase ?? 0;
-    }),
+  protected readonly maximo = computed(() => this.campania()?.maxEvidenciasDia ?? 0);
+
+  protected readonly usadasHoy = computed(() => {
+    const hoy = claveDia(new Date());
+    return this.registros()
+      .filter((r) => consumeCupo(r.estado) && r.fecha.slice(0, 10) === hoy)
+      .reduce((suma, r) => suma + r.totalEvidencias, 0);
+  });
+
+  protected readonly restantesHoy = computed(() => Math.max(0, this.maximo() - this.usadasHoy()));
+
+  protected readonly totalVeces = computed(() =>
+    this.lineas().reduce((suma, linea) => suma + linea.veces, 0),
   );
 
-  protected readonly subtotales = computed(() =>
-    this.valoresDetalles().map((linea) => {
-      const habito = this.habitos().find((h) => h.id === linea.habitoId);
-      return (habito?.puntajeBase ?? 0) * (linea.veces ?? 0);
-    }),
+  protected readonly puntaje = computed(() =>
+    this.lineas().reduce((suma, linea) => suma + linea.habito.puntajeBase * linea.veces, 0),
   );
 
-  protected readonly opcionesPorLinea = computed(() =>
-    this.valoresDetalles().map((linea) => {
-      const valor: unknown = linea.busqueda;
-      const texto = (typeof valor === 'string' ? valor : '').toLowerCase();
-      return this.habitos().filter((h) => h.nombre.toLowerCase().includes(texto));
-    }),
-  );
+  protected readonly excede = computed(() => this.totalVeces() > this.restantesHoy());
 
-  protected readonly puntajeTotal = computed(() =>
-    this.subtotales().reduce((suma, s) => suma + s, 0),
-  );
+  protected readonly puedeSeguir = computed(() => {
+    if (this.paso() === 1) return this.lineas().length > 0;
+    return this.lineas().length > 0 && !this.excede() && this.lineas().every((l) => l.veces > 0);
+  });
 
-  protected readonly totalEvidencias = computed(() =>
-    this.valoresDetalles().reduce((suma, linea) => suma + (linea.veces ?? 0), 0),
-  );
-
-  protected readonly coleccionValida = computed(() =>
-    this.valoresDetalles().length > 0 &&
-    this.valoresDetalles().every((linea) => (linea.habitoId ?? 0) > 0 && (linea.veces ?? 0) > 0),
-  );
-
-  constructor() {
-    this.habitoService.listar().subscribe({
-      next: (data) => this.habitos.set(data.filter((h) => h.activo === 1)),
-      error: () => this.error.set('No se pudieron cargar los habitos.'),
+  ngOnInit(): void {
+    this.campaniaService.obtenerActiva().subscribe({
+      next: (data) => this.campania.set(data),
+      error: () => {
+        this.sinCampania.set(true);
+        this.cargando.set(false);
+      },
+    });
+    this.campaniaService.habitosDeActiva().subscribe({
+      next: (data) => {
+        this.habitos.set(data.filter((habito) => habito.activo === 1));
+        this.cargando.set(false);
+      },
+      error: () => this.cargando.set(false),
+    });
+    this.registroService.buscar().subscribe({
+      next: (data) => this.registros.set(data),
     });
   }
 
-  protected agregarLinea(): void {
-    this.lineasForm.push(this.crearLinea());
+  protected seleccionado(habito: Habito): boolean {
+    return this.lineas().some((linea) => linea.habito.id === habito.id);
   }
 
-  protected quitarLinea(indice: number): void {
-    if (this.lineasForm.length > 1) {
-      this.lineasForm.removeAt(indice);
+  protected alternar(habito: Habito): void {
+    this.lineas.update((lista) =>
+      lista.some((linea) => linea.habito.id === habito.id)
+        ? lista.filter((linea) => linea.habito.id !== habito.id)
+        : [...lista, { habito, veces: 1, descripcion: '', urlImagen: '' }],
+    );
+  }
+
+  protected filtrar(categoriaId: number | null): void {
+    this.categoriaFiltro.set(categoriaId);
+  }
+
+  protected cambiarVeces(indice: number, delta: number): void {
+    this.lineas.update((lista) =>
+      lista.map((linea, i) =>
+        i === indice ? { ...linea, veces: Math.max(1, linea.veces + delta) } : linea,
+      ),
+    );
+  }
+
+  protected escribir(indice: number, campo: 'descripcion' | 'urlImagen', evento: Event): void {
+    const valor = (evento.target as HTMLInputElement | HTMLTextAreaElement).value;
+    this.lineas.update((lista) =>
+      lista.map((linea, i) => (i === indice ? { ...linea, [campo]: valor } : linea)),
+    );
+  }
+
+  protected quitar(indice: number): void {
+    this.lineas.update((lista) => lista.filter((_, i) => i !== indice));
+    if (this.lineas().length === 0) {
+      this.paso.set(1);
     }
   }
 
-  protected seleccionarHabito(indice: number, evento: MatAutocompleteSelectedEvent): void {
-    const habito: Habito = evento.option.value;
-    this.lineasForm.at(indice).patchValue({ habitoId: habito.id, busqueda: habito.nombre });
+  protected irA(paso: Paso): void {
+    if (paso > this.paso() && !this.puedeSeguir()) return;
+    this.error.set(null);
+    this.paso.set(paso);
   }
 
-  protected confirmarYGuardar(): void {
-    if (this.form.invalid || !this.coleccionValida()) {
-      this.form.markAllAsTouched();
-      this.error.set(
-        'Revisa el registro: necesitas al menos una evidencia, cada una con un habito elegido de la lista y un numero de veces de al menos 1.',
-      );
-      return;
+  protected siguiente(): void {
+    if (this.paso() < 3) {
+      this.irA((this.paso() + 1) as Paso);
     }
-    this.error.set(null);
-
-    const lineas = this.lineasForm.getRawValue();
-    const detalle = lineas
-      .map((l) => {
-        const habito = this.habitos().find((h) => h.id === l.habitoId);
-        return `  - ${habito?.nombre ?? 'habito ' + l.habitoId} x${l.veces}`;
-      })
-      .join('\n');
-
-    const resumen =
-      `Vas a registrar la participacion del estudiante ${this.form.controls.estudianteId.value}\n\n` +
-      `${detalle}\n\n` +
-      `Evidencias: ${this.totalEvidencias()}\n` +
-      `Puntaje total: ${this.puntajeTotal().toFixed(2)} pts\n\n` +
-      `Esta operacion consume tu cupo diario. Confirmar?`;
-
-    if (!confirm(resumen)) return;
-    this.guardar();
   }
 
-  private guardar(): void {
+  protected anterior(): void {
+    if (this.paso() > 1) {
+      this.irA((this.paso() - 1) as Paso);
+    }
+  }
+
+  protected enviar(): void {
+    if (!this.puedeSeguir() || this.enviando()) return;
     this.error.set(null);
-    this.loading.set(true);
-    const detalles = this.lineasForm.getRawValue().map(({ habitoId, veces, descripcion, urlImagen }) => ({
-      habitoId,
-      veces,
-      descripcion: descripcion || undefined,
-      urlImagen: urlImagen || undefined,
+    this.enviando.set(true);
+    const detalles = this.lineas().map((linea) => ({
+      habitoId: linea.habito.id,
+      veces: linea.veces,
+      descripcion: linea.descripcion.trim() || undefined,
+      urlImagen: linea.urlImagen.trim() || undefined,
     }));
-    this.registroService
-      .crear({ estudianteId: this.form.controls.estudianteId.value, detalles })
-      .subscribe({
-        next: () => this.router.navigate(['/participacion/reporte']),
-        error: (err: HttpErrorResponse) => this.manejarErrorGuardado(err),
-      });
-  }
-
-  private manejarErrorGuardado(err: HttpErrorResponse): void {
-    const mensaje: string = err.error?.message ?? '';
-
-    if (err.status === 404 && mensaje.startsWith('Habito no encontrado')) {
-      this.error.set('Uno de los habitos elegidos ya no existe. Revisa las evidencias del registro.');
-    } else if (err.status === 404 && mensaje.includes('campania')) {
-      this.error.set('No hay una campania activa en este momento, asi que no se puede registrar participacion.');
-    } else if (err.status === 409) {
-      this.error.set(mensaje || 'Superaste el cupo diario de evidencias de la campania.');
-    } else if (err.status === 400) {
-      this.error.set('Los datos enviados no son validos. Revisa las evidencias del registro.');
-    } else {
-      this.error.set('No se pudo registrar la participacion.');
-    }
-    this.loading.set(false);
-  }
-
-  protected get lineasForm() {
-    return this.form.controls.detalles;
-  }
-
-  private crearLinea() {
-    return this.fb.nonNullable.group({
-      habitoId: [0, [Validators.min(1)]],
-      busqueda: [''],
-      veces: [1, [Validators.required, Validators.min(1)]],
-      descripcion: [''],
-      urlImagen: [''],
+    this.registroService.crear({ detalles }).subscribe({
+      next: (registro) => {
+        this.creado.set(registro);
+        this.enviando.set(false);
+      },
+      error: (err: HttpErrorResponse) => {
+        this.enviando.set(false);
+        if (err.status === 409) {
+          this.error.set(
+            'Ya no te alcanza el cupo de hoy. Puede que hayas registrado desde otra pestaña: reduce las veces o vuelve mañana.',
+          );
+          this.registroService.buscar().subscribe({ next: (data) => this.registros.set(data) });
+          this.paso.set(2);
+        } else {
+          this.error.set(mensajeDeError(err, 'No se pudo enviar tu registro. Inténtalo otra vez.'));
+        }
+      },
     });
+  }
+
+  protected nuevoRegistro(): void {
+    this.creado.set(null);
+    this.lineas.set([]);
+    this.paso.set(1);
+    this.registroService.buscar().subscribe({ next: (data) => this.registros.set(data) });
   }
 }
