@@ -1,0 +1,88 @@
+<section class="ss-pagina">
+  <header class="ss-cabecera">
+    <div>
+      <span class="ss-eyebrow">Configuración</span>
+      <h1 class="ss-titulo">Auditoría</h1>
+      <p class="ss-descripcion">Quién hizo cada acción importante, sobre qué y cuándo. Los registros solo se agregan: nadie puede editarlos ni borrarlos.</p>
+    </div>
+  </header>
+
+  @if (error()) {
+    <div class="ss-aviso ss-aviso-error">
+      <span class="material-symbols-outlined">error</span>
+      <span>{{ error() }}</span>
+    </div>
+  }
+
+  <div class="ss-tarjeta">
+    <div class="filtros">
+      <label class="buscador">
+        <span class="material-symbols-outlined">search</span>
+        <input type="search" placeholder="Buscar por usuario o nombre" (change)="buscarUsuario($event)" />
+      </label>
+      <mat-select class="ss-select filtro-accion" panelClass="ss-select-panel" [value]="accion()" (selectionChange)="filtrarAccion($event.value)" placeholder="Todas las acciones">
+        <mat-option value="">Todas las acciones</mat-option>
+        @for (a of acciones(); track a) {
+          <mat-option [value]="a">{{ info(a).texto }}</mat-option>
+        }
+      </mat-select>
+    </div>
+
+    <table class="ss-tabla ss-tabla-apilable">
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Usuario</th>
+          <th>Acción</th>
+          <th>Sobre</th>
+          <th>Detalle</th>
+          <th>Sede</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (e of eventos(); track e.id) {
+          <tr>
+            <td data-etiqueta="Fecha" class="fecha">{{ e.fecha | date: "d MMM y, HH:mm:ss" }}</td>
+            <td data-etiqueta="Usuario">
+              <span class="quien">
+                <strong>{{ e.nombre || e.usuario }}</strong>
+                <code>{{ e.usuario }}</code>
+              </span>
+            </td>
+            <td data-etiqueta="Acción">
+              <span class="ss-badge accion" [class]="'ss-badge accion ' + info(e.accion).clase">
+                <span class="material-symbols-outlined">{{ info(e.accion).icono }}</span>
+                {{ info(e.accion).texto }}
+              </span>
+            </td>
+            <td data-etiqueta="Sobre"><code>{{ e.entidad }}{{ e.entidadId ? ' #' + e.entidadId : '' }}</code></td>
+            <td data-etiqueta="Detalle" class="detalle">{{ e.detalle || '—' }}</td>
+            <td data-etiqueta="Sede">{{ e.sede ? nombreSede(e.sede) : '—' }}</td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="6" class="ss-vacio">
+              {{ cargando() ? 'Cargando auditoría...' : 'Todavía no hay acciones registradas con esos filtros.' }}
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    @if (totalElementos() > 0) {
+      <nav class="paginador" aria-label="Paginación de la auditoría">
+        <span>{{ desdeFila() }}–{{ hastaFila() }} de {{ totalElementos() }}</span>
+        <div class="ss-acciones en-linea">
+          <button type="button" class="ss-btn ss-btn-secundario ss-btn-chico" (click)="irA(pagina() - 1)" [disabled]="pagina() === 0">
+            <span class="material-symbols-outlined">chevron_left</span>
+            Anterior
+          </button>
+          <button type="button" class="ss-btn ss-btn-secundario ss-btn-chico" (click)="irA(pagina() + 1)" [disabled]="pagina() >= totalPaginas() - 1">
+            Siguiente
+            <span class="material-symbols-outlined">chevron_right</span>
+          </button>
+        </div>
+      </nav>
+    }
+  </div>
+</section>

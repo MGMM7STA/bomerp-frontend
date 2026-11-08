@@ -2,8 +2,9 @@ import { DatePipe, DecimalPipe } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
-import { RegistroService } from './registro-service';
-import { RegistroResponse } from './registro.model';
+import { FiltrosRegistro, RegistroService } from './registro-service';
+import { RegistroResponse, RegistroTotales } from './registro.model';
+import { MatSelectModule } from '@angular/material/select';
 import { AuthService } from '../../../core/auth/auth-service';
 import { EstudianteService } from '../estudiante/estudiante-service';
 import { SedeService } from '../../../core/sede/sede-service';
@@ -13,7 +14,7 @@ import { estiloEstado } from '../../../shared/utilidades/estados';
 
 @Component({
   selector: 'app-registro-reporte',
-  imports: [DatePipe, DecimalPipe, RouterLink],
+  imports: [DatePipe, DecimalPipe, RouterLink, MatSelectModule],
   templateUrl: './registro-reporte.html',
   styleUrl: './registro-reporte.css',
 })
@@ -27,6 +28,12 @@ export class RegistroReporteComponent implements OnInit {
   protected readonly estudiantes = signal<Map<number, Estudiante>>(new Map());
 
   protected readonly registros = signal<RegistroResponse[]>([]);
+  protected readonly totales = signal<RegistroTotales | null>(null);
+  protected readonly pagina = signal(0);
+  protected readonly tamanio = signal(10);
+  protected readonly totalElementos = signal(0);
+  protected readonly totalPaginas = signal(0);
+  protected readonly tamanios = [5, 10, 20, 50];
   protected readonly estadoFiltro = signal('');
   protected readonly desdeFiltro = signal('');
   protected readonly hastaFiltro = signal('');
@@ -34,36 +41,18 @@ export class RegistroReporteComponent implements OnInit {
   protected readonly aviso = signal<string | null>(null);
   protected readonly loading = signal(false);
 
-  protected readonly totalRegistros = computed(() => this.registros().length);
-
-  protected readonly evidenciasTotales = computed(() =>
-    this.registros().reduce((suma, r) => suma + r.totalEvidencias, 0),
+  protected readonly desdeFila = computed(() =>
+    this.totalElementos() === 0 ? 0 : this.pagina() * this.tamanio() + 1,
+  );
+  protected readonly hastaFila = computed(() =>
+    Math.min((this.pagina() + 1) * this.tamanio(), this.totalElementos()),
   );
 
-  protected readonly puntajeAcumulado = computed(() =>
-    this.registros().reduce((suma, r) => suma + Number(r.puntajeValidado ?? 0), 0),
-  );
-
-  protected readonly puntajePromedio = computed(() =>
-    this.totalRegistros() === 0 ? 0 : this.puntajeAcumulado() / this.totalRegistros(),
-  );
-
-  protected readonly habitoMasRegistrado = computed(() => {
-    const conteo = new Map<string, number>();
-    for (const registro of this.registros()) {
-      for (const detalle of registro.detalles) {
-        conteo.set(detalle.nombreHabito, (conteo.get(detalle.nombreHabito) ?? 0) + detalle.veces);
-      }
-    }
-    let nombre = '-';
-    let mayor = 0;
-    for (const [clave, valor] of conteo) {
-      if (valor > mayor) {
-        mayor = valor;
-        nombre = clave;
-      }
-    }
-    return mayor === 0 ? '-' : `${nombre} (${mayor})`;
+  protected readonly paginas = computed(() => {
+    const total = this.totalPaginas();
+    const actual = this.pagina();
+    const inicio = Math.max(0, Math.min(actual - 2, total - 5));
+    return Array.from({ length: Math.min(5, total) }, (_, i) => inicio + i);
   });
 
   ngOnInit(): void {
@@ -73,25 +62,59 @@ export class RegistroReporteComponent implements OnInit {
     this.cargar();
   }
 
+  private filtros(): FiltrosRegistro {
+    return {
+      estado: this.estadoFiltro() || undefined,
+      desde: this.desdeFiltro() ? `${this.desdeFiltro()}T00:00:00` : undefined,
+      hasta: this.hastaFiltro() ? `${this.hastaFiltro()}T23:59:59` : undefined,
+    };
+  }
+
   protected cargar(): void {
+    this.cargarTotales();
+    this.cargarPagina();
+  }
+
+  private cargarTotales(): void {
+    this.registroService.totales(this.filtros()).subscribe({
+      next: (data) => this.totales.set(data),
+      error: () => this.totales.set(null),
+    });
+  }
+
+  protected cargarPagina(): void {
     this.loading.set(true);
     this.error.set(null);
-    const desde = this.desdeFiltro() ? `${this.desdeFiltro()}T00:00:00` : undefined;
-    const hasta = this.hastaFiltro() ? `${this.hastaFiltro()}T23:59:59` : undefined;
-    this.registroService
-      .buscar(this.estadoFiltro() || undefined, undefined, desde, hasta)
-      .subscribe({
-        next: (data) => this.registros.set(data),
-        error: () => {
-          this.error.set('No se pudo cargar el reporte de participación.');
-          this.loading.set(false);
-        },
-        complete: () => this.loading.set(false),
-      });
+    this.registroService.buscarPagina(this.filtros(), this.pagina(), this.tamanio()).subscribe({
+      next: (data) => {
+        this.registros.set(data.contenido);
+        this.totalElementos.set(data.totalElementos);
+        this.totalPaginas.set(data.totalPaginas);
+        this.loading.set(false);
+        if (data.contenido.length === 0 && data.pagina > 0) this.irA(data.pagina - 1);
+      },
+      error: () => {
+        this.error.set('No se pudo cargar el reporte de participación.');
+        this.loading.set(false);
+      },
+    });
+  }
+
+  protected irA(pagina: number): void {
+    if (pagina < 0 || (this.totalPaginas() > 0 && pagina >= this.totalPaginas())) return;
+    this.pagina.set(pagina);
+    this.cargarPagina();
+  }
+
+  protected cambiarTamanio(tamanio: number): void {
+    this.tamanio.set(tamanio);
+    this.pagina.set(0);
+    this.cargarPagina();
   }
 
   protected filtrarPorEstado(estado: string): void {
     this.estadoFiltro.set(estado);
+    this.pagina.set(0);
     this.aviso.set(null);
     this.cargar();
   }
@@ -103,6 +126,7 @@ export class RegistroReporteComponent implements OnInit {
     }
     this.desdeFiltro.set(desde);
     this.hastaFiltro.set(hasta);
+    this.pagina.set(0);
     this.aviso.set(null);
     this.cargar();
   }
@@ -111,6 +135,7 @@ export class RegistroReporteComponent implements OnInit {
     this.estadoFiltro.set('');
     this.desdeFiltro.set('');
     this.hastaFiltro.set('');
+    this.pagina.set(0);
     this.aviso.set(null);
     this.cargar();
   }

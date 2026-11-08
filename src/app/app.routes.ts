@@ -81,6 +81,11 @@ export const routes: Routes = [
         loadComponent: () => import('./features/cuentas/cuentas').then((m) => m.Cuentas),
       },
       {
+        path: 'auditoria',
+        canActivate: [authGuard, rolGuard('ADMIN')],
+        loadComponent: () => import('./features/auditoria/auditoria').then((m) => m.Auditoria),
+      },
+      {
         path: 'participacion/registrar',
         canActivate: [authGuard, rolGuard('ESTUDIANTE')],
         loadComponent: () =>

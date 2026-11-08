@@ -50,6 +50,7 @@ const GRUPOS: GrupoMenu[] = [
       { ruta: '/campanias/habitos', icono: 'self_improvement', texto: 'Hábitos', roles: COORDINACION },
       { ruta: '/campanias/categorias-habito', icono: 'sell', texto: 'Categorías de hábito', roles: ['ADMIN'] },
       { ruta: '/cuentas', icono: 'manage_accounts', texto: 'Cuentas', roles: ['ADMIN'] },
+      { ruta: '/auditoria', icono: 'policy', texto: 'Auditoría', roles: ['ADMIN'] },
     ],
   },
   {

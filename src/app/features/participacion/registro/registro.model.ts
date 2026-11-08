@@ -40,3 +40,22 @@ export interface RegistroResponse {
   fechaRevision?: string | null;
   detalles: DetalleEvidenciaResponse[];
 }
+
+export interface Pagina<T> {
+  contenido: T[];
+  pagina: number;
+  tamanio: number;
+  totalElementos: number;
+  totalPaginas: number;
+  primera: boolean;
+  ultima: boolean;
+}
+
+export interface RegistroTotales {
+  totalRegistros: number;
+  evidenciasTotales: number;
+  puntajeValidado: number;
+  puntajePromedio: number;
+  habitoMasRegistrado: string | null;
+  vecesHabito: number;
+}

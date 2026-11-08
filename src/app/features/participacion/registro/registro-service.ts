@@ -2,7 +2,13 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ApiService } from '../../../core/services/api-service';
-import { RegistroRequest, RegistroResponse } from './registro.model';
+import { Pagina, RegistroRequest, RegistroResponse, RegistroTotales } from './registro.model';
+
+export interface FiltrosRegistro {
+  estado?: string;
+  desde?: string;
+  hasta?: string;
+}
 
 @Injectable({ providedIn: 'root' })
 export class RegistroService {
@@ -33,6 +39,29 @@ export class RegistroService {
     if (desde) params = params.set('desde', desde);
     if (hasta) params = params.set('hasta', hasta);
     return this.http.get<RegistroResponse[]>(this.api.buildUrl(this.resource), { params });
+  }
+
+  buscarPagina(filtros: FiltrosRegistro, pagina: number, tamanio: number): Observable<Pagina<RegistroResponse>> {
+    const params = this.filtrar(filtros)
+      .set('ordenarPor', 'fecha')
+      .set('direccion', 'DESC')
+      .set('pagina', pagina)
+      .set('tamanio', tamanio);
+    return this.http.get<Pagina<RegistroResponse>>(this.api.buildUrl(`${this.resource}/pagina`), { params });
+  }
+
+  totales(filtros: FiltrosRegistro): Observable<RegistroTotales> {
+    return this.http.get<RegistroTotales>(this.api.buildUrl(`${this.resource}/totales`), {
+      params: this.filtrar(filtros),
+    });
+  }
+
+  private filtrar(filtros: FiltrosRegistro): HttpParams {
+    let params = new HttpParams();
+    if (filtros.estado) params = params.set('estado', filtros.estado);
+    if (filtros.desde) params = params.set('desde', filtros.desde);
+    if (filtros.hasta) params = params.set('hasta', filtros.hasta);
+    return params;
   }
 
   anular(id: number): Observable<RegistroResponse> {

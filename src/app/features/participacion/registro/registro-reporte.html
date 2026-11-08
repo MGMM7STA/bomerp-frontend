@@ -20,26 +20,36 @@
 
   <section class="ss-stats">
     <div class="ss-stat">
-      <span class="ss-stat-valor">{{ totalRegistros() }}</span>
+      <span class="ss-stat-valor">{{ totales()?.totalRegistros ?? 0 }}</span>
       <span class="ss-stat-nombre">Registros</span>
     </div>
     <div class="ss-stat">
-      <span class="ss-stat-valor">{{ evidenciasTotales() }}</span>
+      <span class="ss-stat-valor">{{ totales()?.evidenciasTotales ?? 0 }}</span>
       <span class="ss-stat-nombre">Evidencias</span>
     </div>
     <div class="ss-stat">
-      <span class="ss-stat-valor">{{ puntajeAcumulado() | number: '1.0-2' }}</span>
+      <span class="ss-stat-valor">{{ totales()?.puntajeValidado ?? 0 | number: '1.0-2' }}</span>
       <span class="ss-stat-nombre">Puntaje validado</span>
     </div>
     <div class="ss-stat">
-      <span class="ss-stat-valor">{{ puntajePromedio() | number: '1.2-2' }}</span>
+      <span class="ss-stat-valor">{{ totales()?.puntajePromedio ?? 0 | number: '1.2-2' }}</span>
       <span class="ss-stat-nombre">Promedio por registro</span>
     </div>
     <div class="ss-stat">
-      <span class="ss-stat-valor habito">{{ habitoMasRegistrado() }}</span>
+      <span class="ss-stat-valor habito">
+        @if (totales()?.habitoMasRegistrado; as habito) {
+          {{ habito }} ({{ totales()?.vecesHabito }})
+        } @else {
+          -
+        }
+      </span>
       <span class="ss-stat-nombre">Hábito más registrado</span>
     </div>
   </section>
+  <p class="nota-totales">
+    <span class="material-symbols-outlined">functions</span>
+    Los totales los calcula Oracle sobre todos los registros que cumplen los filtros, no solo sobre la página que estás viendo.
+  </p>
 
   <div class="ss-tarjeta">
     <div class="ss-filtros">
@@ -130,5 +140,37 @@
         </tfoot>
       </table>
     </article>
+  }
+  @if (totalElementos() > 0) {
+    <nav class="paginador" aria-label="Paginación del reporte">
+      <span class="paginador-rango">{{ desdeFila() }}–{{ hastaFila() }} de {{ totalElementos() }}</span>
+      <div class="paginador-botones">
+        <button type="button" class="paginador-boton" (click)="irA(0)" [disabled]="pagina() === 0" aria-label="Primera página">
+          <span class="material-symbols-outlined">first_page</span>
+        </button>
+        <button type="button" class="paginador-boton" (click)="irA(pagina() - 1)" [disabled]="pagina() === 0" aria-label="Página anterior">
+          <span class="material-symbols-outlined">chevron_left</span>
+        </button>
+        @for (numero of paginas(); track numero) {
+          <button type="button" class="paginador-boton numero" [class.activo]="numero === pagina()" (click)="irA(numero)">
+            {{ numero + 1 }}
+          </button>
+        }
+        <button type="button" class="paginador-boton" (click)="irA(pagina() + 1)" [disabled]="pagina() >= totalPaginas() - 1" aria-label="Página siguiente">
+          <span class="material-symbols-outlined">chevron_right</span>
+        </button>
+        <button type="button" class="paginador-boton" (click)="irA(totalPaginas() - 1)" [disabled]="pagina() >= totalPaginas() - 1" aria-label="Última página">
+          <span class="material-symbols-outlined">last_page</span>
+        </button>
+      </div>
+      <label class="paginador-tamanio">
+        Por página
+        <mat-select class="ss-select" panelClass="ss-select-panel" [value]="tamanio()" (selectionChange)="cambiarTamanio($event.value)">
+          @for (opcion of tamanios; track opcion) {
+            <mat-option [value]="opcion">{{ opcion }}</mat-option>
+          }
+        </mat-select>
+      </label>
+    </nav>
   }
 </section>
