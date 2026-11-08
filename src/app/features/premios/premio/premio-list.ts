@@ -6,6 +6,7 @@ import {
   inject
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { MatSelectModule } from '@angular/material/select';
 
 import { PremioService } from './premio-service';
 import { AuthService } from '../../../core/auth/auth-service';
@@ -16,7 +17,7 @@ import { CategoriaPremio } from '../categoria-premio/categoria-premio.model';
 
 @Component({
   selector: 'app-premios',
-  imports: [FormsModule],
+  imports: [FormsModule, MatSelectModule],
   templateUrl: './premio-list.html',
   styleUrl: './premio-list.css',
 })

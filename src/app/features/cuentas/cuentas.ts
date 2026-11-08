@@ -10,6 +10,7 @@ import { SolicitudService } from './solicitud-service';
 import { EstadoSolicitud, SolicitudCuenta } from './solicitud.model';
 import { ImagenSegura } from '../../shared/imagen-segura/imagen-segura';
 import { SEDES, SedeService, nombreSede } from '../../core/sede/sede-service';
+import { environment } from '../../../environments/environment';
 
 type Panel =
   | { tipo: 'crear' }
@@ -44,6 +45,7 @@ export class Cuentas implements OnInit {
   private readonly sedeService = inject(SedeService);
 
   protected readonly sedes = SEDES;
+  protected readonly odoo = environment.odoo;
   protected readonly nombreSede = nombreSede;
 
   protected readonly roles: OpcionRol[] = [
@@ -127,7 +129,7 @@ export class Cuentas implements OnInit {
 
   ngOnInit(): void {
     this.cargar();
-    this.cargarSolicitudes();
+    if (this.odoo) this.cargarSolicitudes();
   }
 
   protected cambiarPestania(pestania: 'cuentas' | 'solicitudes'): void {

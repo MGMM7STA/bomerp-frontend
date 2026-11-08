@@ -48,17 +48,19 @@
 
           <div class="form-field">
             <label for="categoriaId">Categoría *</label>
-            <select
+            <mat-select
               id="categoriaId"
               name="categoriaId"
+              class="ss-select"
+              panelClass="ss-select-panel"
               [(ngModel)]="categoriaId"
+              placeholder="Selecciona una categoría"
               required
             >
-              <option [ngValue]="null" disabled>Selecciona una categoría</option>
               @for (categoria of categorias; track categoria.id) {
-                <option [ngValue]="categoria.id">{{ categoria.nombre }}</option>
+                <mat-option [value]="categoria.id">{{ categoria.nombre }}</mat-option>
               }
-            </select>
+            </mat-select>
           </div>
 
           <div class="form-field">
@@ -76,10 +78,10 @@
 
           <div class="form-field">
             <label for="activo">Estado</label>
-            <select id="activo" name="activo" [(ngModel)]="activo">
-              <option [ngValue]="true">Activo</option>
-              <option [ngValue]="false">Inactivo</option>
-            </select>
+            <mat-select id="activo" name="activo" class="ss-select" panelClass="ss-select-panel" [(ngModel)]="activo">
+              <mat-option [value]="true">Activo</mat-option>
+              <mat-option [value]="false">Inactivo</mat-option>
+            </mat-select>
           </div>
         </div>
 
@@ -117,17 +119,20 @@
 
     <div class="filter-row">
       <label for="filtroCategoria">Filtrar por categoría</label>
-      <select
+      <mat-select
         id="filtroCategoria"
         name="filtroCategoria"
+        class="ss-select"
+        panelClass="ss-select-panel"
         [(ngModel)]="filtroCategoriaId"
         (ngModelChange)="listar()"
+        placeholder="Todas las categorías"
       >
-        <option [ngValue]="null">Todas las categorías</option>
+        <mat-option [value]="null">Todas las categorías</mat-option>
         @for (categoria of categorias; track categoria.id) {
-          <option [ngValue]="categoria.id">{{ categoria.nombre }}</option>
+          <mat-option [value]="categoria.id">{{ categoria.nombre }}</mat-option>
         }
-      </select>
+      </mat-select>
     </div>
 
     @if (cargando) {

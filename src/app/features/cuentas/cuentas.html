@@ -3,9 +3,16 @@
     <div>
       <span class="ss-eyebrow">Configuración</span>
       <h1 class="ss-titulo">Cuentas</h1>
-      <p class="ss-descripcion">Solo el administrador crea cuentas: revisa las solicitudes que llegan desde el formulario de Odoo o crea una a mano. Cada cuenta pertenece a una sede.</p>
+      <p class="ss-descripcion">
+        @if (odoo) {
+          Solo el administrador crea cuentas: revisa las solicitudes que llegan desde el formulario de Odoo o crea una a mano. Cada cuenta pertenece a una sede.
+        } @else {
+          Solo el administrador crea cuentas. Cada cuenta pertenece a una sede, salvo la del administrador, que ve las tres.
+        }
+      </p>
     </div>
     <div class="ss-acciones">
+      @if (odoo) {
       <button type="button" class="ss-btn ss-btn-secundario" (click)="exportar('contactos')" [disabled]="exportando() !== null">
         <span class="material-symbols-outlined">{{ exportando() === 'contactos' ? 'hourglass_top' : 'group' }}</span>
         Estudiantes para Odoo
@@ -14,6 +21,7 @@
         <span class="material-symbols-outlined">{{ exportando() === 'puntos' ? 'hourglass_top' : 'loyalty' }}</span>
         Puntos para Odoo
       </button>
+      }
       <button type="button" class="ss-btn ss-btn-primario" (click)="abrirCrear()">
         <span class="material-symbols-outlined">person_add</span>
         Nueva cuenta
@@ -21,6 +29,7 @@
     </div>
   </header>
 
+  @if (odoo) {
   <nav class="pestanias" role="tablist">
     <button type="button" role="tab" [class.activa]="pestania() === 'cuentas'" (click)="cambiarPestania('cuentas')">
       <span class="material-symbols-outlined">manage_accounts</span>
@@ -34,6 +43,7 @@
       }
     </button>
   </nav>
+  }
 
   <div class="ss-chips filtro-sede" aria-label="Filtrar por sede">
     <span class="filtro-etiqueta">

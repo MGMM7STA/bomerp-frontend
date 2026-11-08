@@ -6,10 +6,11 @@ import { CategoriaHabitoService } from '../categoria-habito/categoria-habito-ser
 import { CategoriaHabito } from '../categoria-habito/categoria-habito.model';
 import { HabitoService } from './habito-service';
 import { MensajeError } from '../../../shared/mensaje-error/mensaje-error';
+import { MatSelectModule } from '@angular/material/select';
 
 @Component({
   selector: 'app-habito-form',
-  imports: [ReactiveFormsModule, RouterLink, MensajeError],
+  imports: [ReactiveFormsModule, RouterLink, MensajeError, MatSelectModule],
   templateUrl: './habito-form.html',
 })
 export class HabitoForm {

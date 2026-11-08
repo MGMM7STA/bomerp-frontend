@@ -1,6 +1,7 @@
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs';
+import { MatSelectModule } from '@angular/material/select';
 import { AuthService } from '../auth/auth-service';
 import { SEDES, Sede, SedeService } from '../sede/sede-service';
 
@@ -69,7 +70,7 @@ const MOVIL: Record<string, string[]> = {
 
 @Component({
   selector: 'app-layout',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, MatSelectModule],
   templateUrl: './layout.html',
   styleUrl: './layout.css',
 })
@@ -134,8 +135,8 @@ export class Layout {
       .subscribe(() => this.menuAbierto.set(false));
   }
 
-  protected cambiarSede(evento: Event): void {
-    this.sede.elegir((evento.target as HTMLSelectElement).value as Sede);
+  protected cambiarSede(sede: Sede): void {
+    this.sede.elegir(sede);
   }
 
   protected alternarMenu(): void {

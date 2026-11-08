@@ -2,6 +2,7 @@ import { DatePipe, DecimalPipe } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { forkJoin } from 'rxjs';
+import { MatSelectModule } from '@angular/material/select';
 import { SedeService } from '../../../core/sede/sede-service';
 import { ConfirmacionService } from '../../../shared/confirmacion/confirmacion';
 import { mensajeDeError } from '../../../shared/utilidades/errores';
@@ -27,7 +28,7 @@ let siguiente = 1;
 
 @Component({
   selector: 'app-actas-premiacion',
-  imports: [DatePipe, DecimalPipe],
+  imports: [DatePipe, DecimalPipe, MatSelectModule],
   templateUrl: './acta-premiacion-list.html',
   styleUrl: './acta-premiacion-list.css',
 })
@@ -125,9 +126,8 @@ export class ActaPremiacionList implements OnInit {
     this.guardando.set(false);
   }
 
-  protected cambiarCampania(evento: Event): void {
-    const valor = Number((evento.target as HTMLSelectElement).value);
-    this.elegirCampania(valor || null);
+  protected cambiarCampania(id: number): void {
+    this.elegirCampania(id || null);
     this.filas.set([]);
   }
 
@@ -198,6 +198,10 @@ export class ActaPremiacionList implements OnInit {
 
   protected quitarFila(fila: Fila): void {
     this.filas.update((lista) => lista.filter((f) => f.clave !== fila.clave));
+  }
+
+  protected elegir(fila: Fila, campo: 'estudianteId' | 'premioId', valor: number): void {
+    this.filas.update((lista) => lista.map((f) => (f.clave === fila.clave ? { ...f, [campo]: valor || null } : f)));
   }
 
   protected cambiar(fila: Fila, campo: 'estudianteId' | 'premioId' | 'posicion' | 'cantidad' | 'puntajeAlcanzado', evento: Event): void {

@@ -92,27 +92,14 @@
   color: var(--ss-lime);
 }
 
-.sede-selector .flecha {
-  right: 0.45rem;
-}
-
-.sede-selector select {
+.sede-selector .ss-select-oscuro {
+  width: 8.5rem;
   height: 100%;
-  padding: 0 2rem 0 2.1rem;
+  padding: 0 0.55rem 0 2.1rem;
   border: none;
   background: transparent;
-  color: #fff;
-  font: inherit;
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  appearance: none;
-  outline: none;
-}
-
-.sede-selector option {
-  color: var(--ss-text);
-  background: #fff;
+  display: flex;
+  align-items: center;
 }
 
 .sede-chip {
@@ -302,17 +289,13 @@
     height: 34px;
   }
 
-  .sede-selector select {
-    padding: 0 1.7rem 0 1.85rem;
-    font-size: 0.8rem;
+  .sede-selector .ss-select-oscuro {
+    width: 7.4rem;
+    padding: 0 0.4rem 0 1.85rem;
   }
 
   .sede-selector .material-symbols-outlined:first-child {
     left: 0.4rem;
-  }
-
-  .sede-selector .flecha {
-    right: 0.3rem;
   }
 
   .sede-chip {

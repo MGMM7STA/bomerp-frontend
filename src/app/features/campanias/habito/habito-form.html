@@ -22,12 +22,11 @@
 
       <div class="ss-campo">
         <label for="categoria">Categoría</label>
-        <select id="categoria" class="ss-input" formControlName="categoriaId">
-          <option [ngValue]="0" disabled>Elige una categoría</option>
+        <mat-select id="categoria" class="ss-select" panelClass="ss-select-panel" formControlName="categoriaId" placeholder="Elige una categoría">
           @for (categoria of categorias(); track categoria.id) {
-            <option [ngValue]="categoria.id">{{ categoria.nombre }}</option>
+            <mat-option [value]="categoria.id">{{ categoria.nombre }}</mat-option>
           }
-        </select>
+        </mat-select>
         <app-mensaje-error [texto]="mensajeValidacion('categoriaId')" />
       </div>
 
@@ -53,10 +52,10 @@
 
         <div class="ss-campo">
           <label for="activo">Estado</label>
-          <select id="activo" class="ss-input" formControlName="activo">
-            <option [ngValue]="1">Activo</option>
-            <option [ngValue]="0">Inactivo</option>
-          </select>
+          <mat-select id="activo" class="ss-select" panelClass="ss-select-panel" formControlName="activo">
+            <mat-option [value]="1">Activo</mat-option>
+            <mat-option [value]="0">Inactivo</mat-option>
+          </mat-select>
           <small>Los inactivos no se pueden registrar.</small>
           <app-mensaje-error [texto]="mensajeValidacion('activo')" />
         </div>

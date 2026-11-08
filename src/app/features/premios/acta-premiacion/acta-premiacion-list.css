@@ -42,7 +42,9 @@
 }
 
 .datos .ss-input,
-.ganador .ss-input {
+.ganador .ss-input,
+.datos .ss-select,
+.ganador .ss-select {
   width: 100%;
   min-width: 0;
   box-sizing: border-box;

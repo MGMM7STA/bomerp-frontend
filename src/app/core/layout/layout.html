@@ -16,12 +16,16 @@
       @if (sede.esAdmin()) {
         <label class="sede-selector" title="Sede que estás viendo">
           <span class="material-symbols-outlined">location_on</span>
-          <select (change)="cambiarSede($event)" aria-label="Sede que estás viendo">
+          <mat-select
+            class="ss-select ss-select-oscuro"
+            panelClass="ss-select-panel"
+            [value]="sede.actual()"
+            (selectionChange)="cambiarSede($event.value)"
+            aria-label="Sede que estás viendo">
             @for (opcion of sedes; track opcion.valor) {
-              <option [value]="opcion.valor" [selected]="opcion.valor === sede.actual()">{{ opcion.nombre }}</option>
+              <mat-option [value]="opcion.valor">{{ opcion.nombre }}</mat-option>
             }
-          </select>
-          <span class="material-symbols-outlined flecha">expand_more</span>
+          </mat-select>
         </label>
       } @else if (sede.actual()) {
         <span class="sede-chip" title="Tu sede">

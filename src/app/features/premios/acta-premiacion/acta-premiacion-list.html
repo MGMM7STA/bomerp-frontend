@@ -45,12 +45,11 @@
       <div class="datos">
         <div class="ss-campo">
           <label for="campania">Campaña</label>
-          <select id="campania" class="ss-input" (change)="cambiarCampania($event)">
-            <option value="" disabled [selected]="!campaniaId()">Elige una campaña</option>
+          <mat-select id="campania" class="ss-select" panelClass="ss-select-panel" [value]="campaniaId()" (selectionChange)="cambiarCampania($event.value)" placeholder="Elige una campaña">
             @for (c of campanias(); track c.id) {
-              <option [value]="c.id" [selected]="c.id === campaniaId()">{{ c.nombre }}{{ c.estado === 'ACTIVA' ? ' (activa)' : '' }}</option>
+              <mat-option [value]="c.id">{{ c.nombre }}{{ c.estado === 'ACTIVA' ? ' (activa)' : '' }}</mat-option>
             }
-          </select>
+          </mat-select>
         </div>
         <div class="ss-campo">
           <label for="desde">Periodo desde</label>
@@ -89,22 +88,20 @@
               </div>
               <div class="ss-campo estudiante">
                 <label [for]="'estudiante-' + fila.clave">Estudiante</label>
-                <select [id]="'estudiante-' + fila.clave" class="ss-input" (change)="cambiar(fila, 'estudianteId', $event)">
-                  <option value="" disabled [selected]="!fila.estudianteId">Elige</option>
+                <mat-select [id]="'estudiante-' + fila.clave" class="ss-select" panelClass="ss-select-panel" [value]="fila.estudianteId" (selectionChange)="elegir(fila, 'estudianteId', $event.value)" placeholder="Elige">
                   @for (e of estudiantes(); track e.id) {
-                    <option [value]="e.id" [selected]="e.id === fila.estudianteId">{{ e.nombre }}</option>
+                    <mat-option [value]="e.id">{{ e.nombre }}</mat-option>
                   }
-                </select>
+                </mat-select>
                 <small>{{ fila.puntajeAlcanzado | number: '1.0-2' }} pts validados</small>
               </div>
               <div class="ss-campo premio">
                 <label [for]="'premio-' + fila.clave">Premio</label>
-                <select [id]="'premio-' + fila.clave" class="ss-input" (change)="cambiar(fila, 'premioId', $event)">
-                  <option value="" disabled [selected]="!fila.premioId">Elige</option>
+                <mat-select [id]="'premio-' + fila.clave" class="ss-select" panelClass="ss-select-panel" [value]="fila.premioId" (selectionChange)="elegir(fila, 'premioId', $event.value)" placeholder="Elige">
                   @for (p of premiosActivos(); track p.id) {
-                    <option [value]="p.id" [selected]="p.id === fila.premioId">{{ p.nombre }} · quedan {{ p.stock }}</option>
+                    <mat-option [value]="p.id">{{ p.nombre }} · quedan {{ p.stock }}</mat-option>
                   }
-                </select>
+                </mat-select>
               </div>
               <div class="ss-campo cantidad">
                 <label [for]="'cantidad-' + fila.clave">Cant.</label>
