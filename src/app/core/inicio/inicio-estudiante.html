@@ -51,6 +51,15 @@
       <span class="numero-valor">{{ diasActivos() }}</span>
       <span class="numero-nombre">días con actividad</span>
     </article>
+    <a class="numero numero-enlace" routerLink="/participacion/ranking">
+      <span class="numero-icono puesto material-symbols-outlined">leaderboard</span>
+      @if (ranking()?.mia; as mia) {
+        <span class="numero-valor">#{{ mia.posicion }} <small>de {{ ranking()?.participantes }}</small></span>
+      } @else {
+        <span class="numero-valor">—</span>
+      }
+      <span class="numero-nombre">tu puesto en {{ sede.nombre() }}</span>
+    </a>
   </section>
 
   <div class="columnas">

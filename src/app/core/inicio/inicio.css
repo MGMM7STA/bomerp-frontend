@@ -107,3 +107,14 @@
     width: 100%;
   }
 }
+
+.solicitar {
+  margin: 0.9rem 0 0;
+  font-size: 0.9rem;
+  color: var(--ss-muted);
+}
+
+.solicitar a {
+  font-weight: 600;
+  color: var(--ss-navy);
+}

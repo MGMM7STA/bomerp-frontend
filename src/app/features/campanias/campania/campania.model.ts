@@ -8,6 +8,7 @@ export interface Campania {
   maxEvidenciasDia: number;
   estado: EstadoCampania;
   habitoIds: number[];
+  sedes: string[];
 }
 
 export interface CampaniaRequest {
@@ -17,4 +18,5 @@ export interface CampaniaRequest {
   maxEvidenciasDia: number;
   estado: EstadoCampania;
   habitoIds: number[];
+  sedes: string[];
 }

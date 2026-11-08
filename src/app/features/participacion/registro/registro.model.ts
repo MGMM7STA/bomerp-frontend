@@ -29,6 +29,7 @@ export interface RegistroResponse {
   id: number;
   estudianteId: number;
   campaniaId: number;
+  sede?: string | null;
   fecha: string;
   estado: EstadoRegistro;
   totalEvidencias: number;

@@ -1,12 +1,14 @@
 <header class="cabecera">
   <div>
-    <span class="eyebrow">Panel de coordinación</span>
+    <span class="eyebrow">Panel de coordinación · {{ sede.nombre() }}</span>
     <h1>{{ campania()?.nombre ?? 'Semestre Saludable' }}</h1>
     @if (campania(); as c) {
       <p class="periodo">
         {{ periodo() }} · <strong>quedan {{ quedan() }} días</strong> · máximo
         {{ c.maxEvidenciasDia }} evidencias por día
       </p>
+    } @else if (sinCampania()) {
+      <p class="periodo">{{ sede.nombre() }} no tiene una campaña activa en este momento.</p>
     }
   </div>
   <a routerLink="/participacion/validacion" class="btn-revisar">

@@ -2,6 +2,7 @@ import { DatePipe, DecimalPipe, NgTemplateOutlet } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { RegistroService } from '../registro/registro-service';
 import { DetalleEvidenciaResponse, RegistroResponse } from '../registro/registro.model';
+import { SedeService } from '../../../core/sede/sede-service';
 import { EstudianteService } from '../estudiante/estudiante-service';
 import { Estudiante } from '../estudiante/estudiante.model';
 import { mensajeDeError } from '../../../shared/utilidades/errores';
@@ -27,6 +28,7 @@ interface Aviso {
 export class Validacion implements OnInit {
   private readonly registroService = inject(RegistroService);
   private readonly estudianteService = inject(EstudianteService);
+  protected readonly sede = inject(SedeService);
 
   protected readonly pendientes = signal<RegistroResponse[]>([]);
   protected readonly estudiantes = signal<Map<number, Estudiante>>(new Map());

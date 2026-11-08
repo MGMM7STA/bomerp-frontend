@@ -3,7 +3,7 @@
     <div>
       <span class="ss-eyebrow">Configuración</span>
       <h1 class="ss-titulo">Campañas</h1>
-      <p class="ss-descripcion">Cada campaña define sus fechas, el cupo diario y qué hábitos cuentan. Solo una puede estar activa.</p>
+      <p class="ss-descripcion">Campañas que se realizan en {{ sede.nombre() }}. Cada sede tiene como máximo una campaña activa a la vez.</p>
     </div>
     <a class="ss-btn ss-btn-primario" routerLink="/campanias/nueva">
       <span class="material-symbols-outlined">add</span>
@@ -26,6 +26,7 @@
           <th>Periodo</th>
           <th class="num">Cupo diario</th>
           <th class="num">Hábitos</th>
+          <th>Sedes</th>
           <th>Estado</th>
           <th>Acciones</th>
         </tr>
@@ -37,11 +38,18 @@
             <td data-etiqueta="Periodo">{{ fecha(campania.fechaInicio) | date: 'd MMM' }} – {{ fecha(campania.fechaFin) | date: 'd MMM y' }}</td>
             <td data-etiqueta="Cupo diario" class="num">{{ campania.maxEvidenciasDia }}</td>
             <td data-etiqueta="Hábitos" class="num">{{ campania.habitoIds.length }}</td>
+            <td data-etiqueta="Sedes">
+              <div class="ss-chips">
+                @for (s of campania.sedes; track s) {
+                  <span class="ss-badge" [class.ss-badge-info]="s === sede.actual()" [class.ss-badge-gris]="s !== sede.actual()">{{ nombreSede(s) }}</span>
+                }
+              </div>
+            </td>
             <td data-etiqueta="Estado">
               <span class="ss-badge" [class]="estado(campania.estado).clase">{{ estado(campania.estado).texto }}</span>
             </td>
             <td data-etiqueta="Acciones">
-              <div class="ss-acciones">
+              <div class="ss-acciones en-linea">
                 <a class="ss-btn ss-btn-secundario ss-btn-chico" [routerLink]="['/campanias', campania.id, 'editar']">
                   <span class="material-symbols-outlined">edit</span>
                   Editar
@@ -55,8 +63,8 @@
           </tr>
         } @empty {
           <tr>
-            <td colspan="6" class="ss-vacio">
-              {{ cargando() ? 'Cargando campañas...' : 'Todavía no hay campañas.' }}
+            <td colspan="7" class="ss-vacio">
+              {{ cargando() ? 'Cargando campañas...' : 'Todavía no hay campañas en ' + sede.nombre() + '.' }}
             </td>
           </tr>
         }

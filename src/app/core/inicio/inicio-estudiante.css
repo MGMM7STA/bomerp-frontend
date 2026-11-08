@@ -73,7 +73,7 @@
 
 .numeros {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 0.75rem;
   margin-bottom: 1.75rem;
 }
@@ -113,6 +113,27 @@
 .numero-icono.dias {
   background: var(--ss-navy-soft);
   color: var(--ss-navy);
+}
+
+.numero-icono.puesto {
+  background: var(--ss-navy);
+  color: #fff;
+}
+
+.numero-enlace {
+  text-decoration: none;
+  color: inherit;
+  transition: box-shadow 0.15s ease;
+}
+
+.numero-enlace:hover {
+  box-shadow: inset 0 0 0 1px var(--ss-navy), var(--ss-sombra);
+}
+
+.numero-valor small {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--ss-muted);
 }
 
 .numero-valor {
@@ -264,6 +285,12 @@
   color: var(--ss-muted);
 }
 
+@media (max-width: 1180px) {
+  .numeros {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 @media (max-width: 860px) {
   .hoy {
     flex-direction: column;
@@ -275,7 +302,22 @@
   }
 
   .numeros {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem;
+  }
+
+  .numero {
+    padding: 0.8rem;
+    column-gap: 0.55rem;
+  }
+
+  .numero-icono {
+    width: 36px;
+    height: 36px;
+  }
+
+  .numero-valor {
+    font-size: 1.25rem;
   }
 
   .columnas {

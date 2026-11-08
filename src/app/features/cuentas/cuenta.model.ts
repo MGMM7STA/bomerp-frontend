@@ -7,6 +7,7 @@ export interface Cuenta {
   apellidos: string;
   correo: string;
   rol: RolCuenta | null;
+  sede: string | null;
   activa: boolean;
   creadaEn: string | null;
 }
@@ -18,4 +19,5 @@ export interface CuentaRequest {
   correo: string;
   rol: RolCuenta;
   contrasenia: string;
+  sede: string | null;
 }

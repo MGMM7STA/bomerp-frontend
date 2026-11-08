@@ -9,6 +9,7 @@ export type EstadoActaPremiacion = 'EMITIDA' | 'ANULADA';
 export interface ActaPremiacion {
   id: number;
   campaniaId: number;
+  sede: string | null;
   fechaInicioPeriodo: string;
   fechaFinPeriodo: string;
   fechaEmision: string;

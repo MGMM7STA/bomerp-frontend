@@ -11,6 +11,7 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { routes } from './app.routes';
 import { authInterceptor } from './core/interceptors/auth-interceptor';
 import { traceIdInterceptor } from './core/interceptors/trace-id-interceptor';
+import { sedeInterceptor } from './core/interceptors/sede-interceptor';
 
 registerLocaleData(localeEsPe);
 
@@ -20,6 +21,6 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),
     provideRouter(routes),
-    provideHttpClient(withInterceptors([authInterceptor, traceIdInterceptor])),
+    provideHttpClient(withInterceptors([authInterceptor, sedeInterceptor, traceIdInterceptor])),
   ],
 };

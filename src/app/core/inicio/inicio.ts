@@ -1,4 +1,5 @@
 import { Component, computed, inject } from '@angular/core';
+import { environment } from '../../../environments/environment';
 import { AuthService } from '../auth/auth-service';
 import { InicioEstudiante } from './inicio-estudiante';
 import { PanelCoordinacion } from './panel-coordinacion';
@@ -11,6 +12,7 @@ import { PanelCoordinacion } from './panel-coordinacion';
 })
 export class Inicio {
   protected readonly auth = inject(AuthService);
+  protected readonly formulario = environment.formularioInscripcionUrl;
 
   protected readonly esCoordinacion = computed(() => this.auth.tieneRol('COORDINADOR', 'ADMIN'));
 }

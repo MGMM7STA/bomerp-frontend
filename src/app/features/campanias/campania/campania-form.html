@@ -55,6 +55,27 @@
       </div>
 
       <div class="ss-campo">
+        <label>Sedes donde se realiza</label>
+        <div class="sedes">
+          @for (s of sedes; track s.valor) {
+            <button
+              type="button"
+              class="sede"
+              [class.marcada]="sedesElegidas().has(s.valor)"
+              [attr.aria-pressed]="sedesElegidas().has(s.valor)"
+              (click)="alternarSede(s.valor)">
+              <span class="material-symbols-outlined">{{ sedesElegidas().has(s.valor) ? 'check_circle' : 'location_on' }}</span>
+              {{ s.nombre }}
+            </button>
+          }
+        </div>
+        <small>Cada sede compite por separado: sus estudiantes, su ranking y sus premios.</small>
+        @if (intentado() && sedesElegidas().size === 0) {
+          <span class="error">Elige al menos una sede.</span>
+        }
+      </div>
+
+      <div class="ss-campo">
         <label>Estado</label>
         <div class="estados">
           @for (e of estados; track e.valor) {

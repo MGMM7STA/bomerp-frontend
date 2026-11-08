@@ -24,6 +24,47 @@
   margin: 0;
 }
 
+.sedes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.sede {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 40px;
+  padding: 0 0.9rem 0 0.7rem;
+  border: 1px solid var(--ss-line);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--ss-text);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.sede .material-symbols-outlined {
+  font-size: 1.15rem;
+  color: var(--ss-muted);
+}
+
+.sede:hover {
+  border-color: var(--ss-navy);
+}
+
+.sede.marcada {
+  border-color: var(--ss-navy);
+  background: var(--ss-navy-soft);
+  color: var(--ss-navy);
+}
+
+.sede.marcada .material-symbols-outlined {
+  color: var(--ss-navy);
+}
+
 .estados {
   display: grid;
   gap: 0.4rem;

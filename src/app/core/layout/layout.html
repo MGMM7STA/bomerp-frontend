@@ -13,6 +13,22 @@
 
   <div class="topbar-derecha">
     @if (auth.autenticado()) {
+      @if (sede.esAdmin()) {
+        <label class="sede-selector" title="Sede que estás viendo">
+          <span class="material-symbols-outlined">location_on</span>
+          <select (change)="cambiarSede($event)" aria-label="Sede que estás viendo">
+            @for (opcion of sedes; track opcion.valor) {
+              <option [value]="opcion.valor" [selected]="opcion.valor === sede.actual()">{{ opcion.nombre }}</option>
+            }
+          </select>
+          <span class="material-symbols-outlined flecha">expand_more</span>
+        </label>
+      } @else if (sede.actual()) {
+        <span class="sede-chip" title="Tu sede">
+          <span class="material-symbols-outlined">location_on</span>
+          {{ sede.nombre() }}
+        </span>
+      }
       <div class="usuario">
         <span class="avatar">{{ iniciales() }}</span>
         <span class="usuario-datos">
@@ -55,7 +71,9 @@
   }
 
   <main class="contenido">
-    <router-outlet />
+    @for (vuelta of [sede.version()]; track vuelta) {
+      <router-outlet />
+    }
   </main>
 </div>
 

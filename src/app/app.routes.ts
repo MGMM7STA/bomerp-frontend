@@ -111,8 +111,14 @@ export const routes: Routes = [
           ),
       },
       {
-        path: 'premios/categorias',
+        path: 'participacion/ranking',
         canActivate: [authGuard],
+        loadComponent: () =>
+          import('./features/participacion/ranking/ranking').then((m) => m.Ranking),
+      },
+      {
+        path: 'premios/categorias',
+        canActivate: [authGuard, rolGuard('COORDINADOR', 'ADMIN')],
         loadComponent: () =>
           import('./features/premios/categoria-premio/categoria-premio-list').then(
             (m) => m.CategoriaPremioList,

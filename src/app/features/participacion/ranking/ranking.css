@@ -1,0 +1,282 @@
+.vacio-grande {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 2.5rem 1.25rem;
+  text-align: center;
+}
+
+.vacio-grande .material-symbols-outlined {
+  font-size: 2.5rem;
+  color: var(--ss-muted);
+}
+
+.vacio-grande h2 {
+  margin: 0.3rem 0 0;
+  font-family: var(--ss-titulos);
+  font-size: 1.1rem;
+  color: var(--ss-navy);
+}
+
+.vacio-grande p {
+  margin: 0;
+  max-width: 420px;
+  font-size: 0.92rem;
+  color: var(--ss-muted);
+}
+
+.mi-puesto {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border-left: 4px solid var(--ss-lime);
+}
+
+.mi-puesto div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.mi-puesto strong {
+  font-size: 1rem;
+  color: var(--ss-ink);
+}
+
+.mi-puesto small {
+  font-size: 0.88rem;
+  color: var(--ss-muted);
+}
+
+.puesto {
+  display: grid;
+  place-items: center;
+  min-width: 3.5rem;
+  height: 3.5rem;
+  padding: 0 0.5rem;
+  border-radius: 14px;
+  background: var(--ss-navy);
+  color: #fff;
+  font-family: var(--ss-titulos);
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+
+.icono-mio {
+  display: grid;
+  place-items: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 14px;
+  background: var(--ss-lime-soft);
+  color: var(--ss-lime-ink);
+  font-size: 1.8rem;
+}
+
+.podio {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: end;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.escalon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  min-width: 0;
+  padding: 1.1rem 0.75rem 0;
+  border-radius: var(--ss-radio);
+  background: #fff;
+  box-shadow: var(--ss-sombra);
+  text-align: center;
+  overflow: hidden;
+}
+
+.escalon.mia {
+  box-shadow: inset 0 0 0 2px var(--ss-lime), var(--ss-sombra);
+}
+
+.escalon .avatar {
+  display: grid;
+  place-items: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  border-radius: 50%;
+  background: var(--ss-navy-soft);
+  color: var(--ss-navy);
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+.escalon.oro .avatar {
+  width: 3.9rem;
+  height: 3.9rem;
+  font-size: 1.2rem;
+  background: var(--ss-navy);
+  color: #fff;
+}
+
+.medalla {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.medalla .material-symbols-outlined {
+  font-size: 1rem;
+  font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+}
+
+.oro .medalla {
+  background: var(--ss-orange-soft);
+  color: var(--ss-orange-ink);
+}
+
+.plata .medalla {
+  background: #eef1f4;
+  color: #4f5b67;
+}
+
+.bronce .medalla {
+  background: #f6e7dc;
+  color: #7a4523;
+}
+
+.nombre {
+  max-width: 100%;
+  font-size: 0.95rem;
+  color: var(--ss-ink);
+  overflow-wrap: anywhere;
+}
+
+.escuela {
+  font-size: 0.78rem;
+  color: var(--ss-muted);
+}
+
+.puntos {
+  margin: 0.2rem 0 0.75rem;
+  font-family: var(--ss-titulos);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--ss-navy);
+}
+
+.puntos small {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--ss-muted);
+}
+
+.base {
+  align-self: stretch;
+  margin: 0 -0.75rem;
+}
+
+.oro .base {
+  height: 3.25rem;
+  background: var(--ss-orange);
+}
+
+.plata .base {
+  height: 2.1rem;
+  background: #c4ccd5;
+}
+
+.bronce .base {
+  height: 1.25rem;
+  background: #d39b72;
+}
+
+.tabla-ranking .posicion {
+  display: inline-grid;
+  place-items: center;
+  min-width: 2rem;
+  height: 2rem;
+  border-radius: 8px;
+  background: var(--ss-bg);
+  font-weight: 700;
+  color: var(--ss-text);
+}
+
+.tabla-ranking tr.mia td {
+  background: var(--ss-lime-soft);
+}
+
+.tabla-ranking tr.mia .posicion {
+  background: var(--ss-lime);
+  color: var(--ss-navy-700);
+}
+
+.escuela-fila {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--ss-muted);
+}
+
+.tu {
+  margin-left: 0.4rem;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  background: var(--ss-lime);
+  color: var(--ss-navy-700);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.pie-nota {
+  margin: 0.75rem 0 0;
+  font-size: 0.85rem;
+  color: var(--ss-muted);
+  text-align: center;
+}
+
+@media (max-width: 600px) {
+  .podio {
+    gap: 0.4rem;
+  }
+
+  .escalon {
+    padding: 0.85rem 0.4rem 0;
+  }
+
+  .escalon .avatar {
+    width: 2.6rem;
+    height: 2.6rem;
+    font-size: 0.9rem;
+  }
+
+  .escalon.oro .avatar {
+    width: 3.1rem;
+    height: 3.1rem;
+  }
+
+  .nombre {
+    font-size: 0.82rem;
+  }
+
+  .escuela {
+    display: none;
+  }
+
+  .puntos {
+    font-size: 1.1rem;
+  }
+
+  .base {
+    margin: 0 -0.4rem;
+  }
+
+  .escuela-fila,
+  .tabla-ranking .col-evidencias {
+    display: none;
+  }
+}

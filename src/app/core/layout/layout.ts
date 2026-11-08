@@ -1,7 +1,8 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs';
 import { AuthService } from '../auth/auth-service';
+import { SEDES, Sede, SedeService } from '../sede/sede-service';
 
 interface ItemMenu {
   ruta: string;
@@ -30,6 +31,7 @@ const GRUPOS: GrupoMenu[] = [
     items: [
       { ruta: '/participacion/registrar', icono: 'add_task', texto: 'Registrar', roles: ['ESTUDIANTE'] },
       { ruta: '/participacion/mis-registros', icono: 'history', texto: 'Mis registros', roles: ['ESTUDIANTE'] },
+      { ruta: '/participacion/ranking', icono: 'leaderboard', texto: 'Ranking', roles: ['ESTUDIANTE'] },
     ],
   },
   {
@@ -37,6 +39,7 @@ const GRUPOS: GrupoMenu[] = [
     items: [
       { ruta: '/participacion/validacion', icono: 'fact_check', texto: 'Validar evidencias', corto: 'Validar', roles: COORDINACION },
       { ruta: '/participacion/reporte', icono: 'monitoring', texto: 'Reporte', roles: COORDINACION },
+      { ruta: '/participacion/ranking', icono: 'leaderboard', texto: 'Ranking', roles: COORDINACION },
     ],
   },
   {
@@ -72,6 +75,8 @@ const MOVIL: Record<string, string[]> = {
 })
 export class Layout {
   protected readonly auth = inject(AuthService);
+  protected readonly sede = inject(SedeService);
+  protected readonly sedes = SEDES;
   private readonly router = inject(Router);
 
   protected readonly menuAbierto = signal(false);
@@ -117,9 +122,20 @@ export class Layout {
   });
 
   constructor() {
+    let cargada = false;
+    effect(() => {
+      if (this.auth.autenticado() && !cargada) {
+        cargada = true;
+        this.sede.cargar();
+      }
+    });
     this.router.events
       .pipe(filter((evento) => evento instanceof NavigationEnd))
       .subscribe(() => this.menuAbierto.set(false));
+  }
+
+  protected cambiarSede(evento: Event): void {
+    this.sede.elegir((evento.target as HTMLSelectElement).value as Sede);
   }
 
   protected alternarMenu(): void {

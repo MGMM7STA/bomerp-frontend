@@ -356,3 +356,249 @@ tr.inactiva code {
     max-width: none;
   }
 }
+
+.pestanias {
+  display: flex;
+  gap: 0.25rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--ss-line);
+}
+
+.pestanias button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.65rem 1rem;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  background: none;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--ss-muted);
+  cursor: pointer;
+}
+
+.pestanias button.activa {
+  border-bottom-color: var(--ss-navy);
+  color: var(--ss-navy);
+}
+
+.contador {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.35rem;
+  height: 1.35rem;
+  padding: 0 0.35rem;
+  border-radius: 999px;
+  background: var(--ss-orange);
+  color: #3d2700;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.filtro-solicitudes {
+  margin-bottom: 0.9rem;
+}
+
+.filtro-sede {
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.filtro-etiqueta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-right: 0.25rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--ss-muted);
+}
+
+.filtro-etiqueta .material-symbols-outlined {
+  font-size: 1.05rem;
+}
+
+.modal-cuerpo .roles + .ss-campo {
+  margin-top: 0.9rem;
+}
+
+@media (max-width: 600px) {
+  .filtro-etiqueta-texto {
+    display: none;
+  }
+}
+
+.solicitud-datos header .solicitud-meta {
+  align-items: flex-end;
+  gap: 0.3rem;
+  flex-shrink: 0;
+}
+
+.sede-texto {
+  font-weight: 600;
+  color: var(--ss-ink);
+}
+
+.sedes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.opcion-sede {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 40px;
+  padding: 0 0.95rem 0 0.75rem;
+  border: 1px solid var(--ss-line);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--ss-text);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.opcion-sede .material-symbols-outlined {
+  font-size: 1.1rem;
+  color: var(--ss-muted);
+}
+
+.opcion-sede.activo {
+  border-color: var(--ss-navy);
+  background: var(--ss-navy-soft);
+  color: var(--ss-navy);
+  box-shadow: inset 0 0 0 1px var(--ss-navy);
+}
+
+.opcion-sede.activo .material-symbols-outlined {
+  color: var(--ss-navy);
+}
+
+.solicitudes {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.solicitud {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 1.1rem;
+  margin-bottom: 0;
+}
+
+.carne {
+  --alto: 140px;
+}
+
+.solicitud-datos header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.solicitud-datos header div {
+  display: flex;
+  flex-direction: column;
+}
+
+.solicitud-datos header strong {
+  font-size: 1rem;
+  color: var(--ss-ink);
+}
+
+.solicitud-datos header small,
+.fecha {
+  font-size: 0.8rem;
+  color: var(--ss-muted);
+}
+
+.solicitud-datos dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem 1rem;
+  margin: 0.8rem 0;
+}
+
+.solicitud-datos dt {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--ss-muted);
+}
+
+.solicitud-datos dd {
+  margin: 0.1rem 0 0;
+  font-size: 0.9rem;
+  color: var(--ss-ink);
+}
+
+.solicitud-datos footer {
+  justify-content: flex-end;
+}
+
+.resultado {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+.resultado.ok {
+  color: var(--ss-lime-ink);
+}
+
+.resultado.no {
+  color: var(--ss-red-ink);
+}
+
+.opcion-correo {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  padding: 0.75rem;
+  border: 1px solid var(--ss-line);
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.opcion-correo input {
+  margin-top: 0.2rem;
+  accent-color: var(--ss-navy);
+}
+
+.opcion-correo strong {
+  display: block;
+  font-size: 0.88rem;
+  color: var(--ss-ink);
+}
+
+.opcion-correo small {
+  font-size: 0.78rem;
+  color: var(--ss-muted);
+}
+
+@media (max-width: 640px) {
+  .solicitud {
+    grid-template-columns: 1fr;
+  }
+
+  .solicitud-datos footer .ss-btn {
+    flex: 1;
+  }
+
+  .pestanias button {
+    flex: 1;
+    justify-content: center;
+  }
+}

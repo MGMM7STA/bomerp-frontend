@@ -11,6 +11,15 @@
         <span class="material-symbols-outlined">login</span>
         Ingresar con mi cuenta
       </button>
+      <p class="solicitar">
+        ¿Aún no tienes cuenta?
+        @if (formulario) {
+          <a [href]="formulario" target="_blank" rel="noopener">Llena el formulario de inscripción</a>
+          y la Dirección de Universidad Saludable te la crea.
+        } @else {
+          Pídela a la Dirección de Universidad Saludable con el formulario de inscripción.
+        }
+      </p>
     </div>
     <ol class="pasos">
       <li>

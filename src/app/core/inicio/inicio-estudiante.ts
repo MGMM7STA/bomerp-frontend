@@ -9,6 +9,9 @@ import { RegistroResponse } from '../../features/participacion/registro/registro
 import { consumeCupo, estiloEstado } from '../../shared/utilidades/estados';
 import { AuthService } from '../auth/auth-service';
 import { claveDia, diasRestantes } from './fechas';
+import { EstudianteService } from '../../features/participacion/estudiante/estudiante-service';
+import { Ranking } from '../../features/participacion/estudiante/estudiante.model';
+import { SedeService } from '../sede/sede-service';
 
 @Component({
   selector: 'app-inicio-estudiante',
@@ -20,6 +23,10 @@ export class InicioEstudiante implements OnInit {
   private readonly campaniaService = inject(CampaniaService);
   private readonly registroService = inject(RegistroService);
   protected readonly auth = inject(AuthService);
+  private readonly estudianteService = inject(EstudianteService);
+  protected readonly sede = inject(SedeService);
+
+  protected readonly ranking = signal<Ranking | null>(null);
 
   protected readonly campania = signal<Campania | null>(null);
   protected readonly habitos = signal<Habito[]>([]);
@@ -81,6 +88,9 @@ export class InicioEstudiante implements OnInit {
     });
     this.registroService.buscar().subscribe({
       next: (data) => this.registros.set(data),
+    });
+    this.estudianteService.ranking(3).subscribe({
+      next: (data) => this.ranking.set(data),
     });
   }
 }

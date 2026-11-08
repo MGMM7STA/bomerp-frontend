@@ -3,7 +3,7 @@
     <div>
       <span class="ss-eyebrow">Seguimiento</span>
       <h1 class="ss-titulo">Validar evidencias</h1>
-      <p class="ss-descripcion">Revisa cada evidencia por separado. Los registros más antiguos salen primero.</p>
+      <p class="ss-descripcion">Evidencias de {{ sede.nombre() }}. Revisa cada una por separado; los registros más antiguos salen primero.</p>
     </div>
     <button type="button" class="ss-btn ss-btn-secundario" (click)="cargar()" [disabled]="cargando()">
       <span class="material-symbols-outlined">refresh</span>

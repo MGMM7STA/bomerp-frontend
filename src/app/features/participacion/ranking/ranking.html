@@ -1,0 +1,128 @@
+<section class="ss-pagina">
+  <header class="ss-cabecera">
+    <div>
+      <span class="ss-eyebrow">{{ esEstudiante() ? 'Mi participación' : 'Seguimiento' }}</span>
+      <h1 class="ss-titulo">Ranking de {{ sede.nombre() }}</h1>
+      <p class="ss-descripcion">
+        @if (datos(); as d) {
+          {{ d.campania }} · Solo cuentan los puntos que la coordinación ya validó.
+        } @else {
+          Solo cuentan los puntos que la coordinación ya validó.
+        }
+        @if (esEstudiante()) {
+          Compites solo con estudiantes de tu sede.
+        }
+      </p>
+    </div>
+    <div class="ss-acciones">
+      <button type="button" class="ss-btn ss-btn-secundario" (click)="cargar()" [disabled]="cargando()">
+        <span class="material-symbols-outlined">refresh</span>
+        Actualizar
+      </button>
+      @if (esCoordinacion() && datos()?.filas?.length) {
+        <a class="ss-btn ss-btn-primario" routerLink="/premios/actas" [queryParams]="{ nueva: 1 }">
+          <span class="material-symbols-outlined">workspace_premium</span>
+          Premiar a los primeros
+        </a>
+      }
+    </div>
+  </header>
+
+  @if (error()) {
+    <div class="ss-aviso ss-aviso-error">
+      <span class="material-symbols-outlined">error</span>
+      <span>{{ error() }}</span>
+    </div>
+  }
+
+  @if (cargando()) {
+    <div class="ss-tarjeta ss-vacio">Cargando ranking...</div>
+  } @else if (sinCampania()) {
+    <div class="ss-tarjeta vacio-grande">
+      <span class="material-symbols-outlined">event_busy</span>
+      <h2>{{ sede.nombre() }} no tiene una campaña activa</h2>
+      <p>El ranking aparece cuando hay una campaña en curso en la sede.</p>
+    </div>
+  } @else if (datos(); as d) {
+    @if (esEstudiante()) {
+      <div class="ss-tarjeta mi-puesto">
+        @if (d.mia; as mia) {
+          <span class="puesto">#{{ mia.posicion }}</span>
+          <div>
+            <strong>Tu puesto en {{ sede.nombre() }}</strong>
+            <small>De {{ d.participantes }} {{ d.participantes === 1 ? 'participante' : 'participantes' }} · {{ mia.puntos | number: '1.0-2' }} pts · {{ mia.evidencias }} {{ mia.evidencias === 1 ? 'evidencia' : 'evidencias' }}</small>
+          </div>
+        } @else {
+          <span class="material-symbols-outlined icono-mio">trending_up</span>
+          <div>
+            <strong>Aún no apareces en el ranking</strong>
+            <small>Registra tus hábitos: cuando la coordinación valide tu primera evidencia, entras a competir.</small>
+          </div>
+        }
+      </div>
+    }
+
+    @if (d.filas.length === 0) {
+      <div class="ss-tarjeta vacio-grande">
+        <span class="material-symbols-outlined">leaderboard</span>
+        <h2>Todavía no hay puntos validados</h2>
+        <p>Cuando la coordinación valide las primeras evidencias, aquí verás quién va adelante.</p>
+      </div>
+    } @else {
+      <div class="podio">
+        @for (fila of ordenPodio(); track fila.estudianteId) {
+          <article class="escalon" [class]="medalla(fila.posicion)" [class.mia]="esMia(fila)">
+            <span class="avatar">{{ iniciales(fila.nombre) }}</span>
+            <span class="medalla">
+              <span class="material-symbols-outlined">workspace_premium</span>
+              {{ fila.posicion }}.º
+            </span>
+            <strong class="nombre">{{ fila.nombre }}</strong>
+            @if (fila.escuela) {
+              <small class="escuela">{{ fila.escuela }}</small>
+            }
+            <span class="puntos">{{ fila.puntos | number: '1.0-2' }} <small>pts</small></span>
+            <div class="base"></div>
+          </article>
+        }
+      </div>
+
+      @if (resto().length > 0) {
+        <div class="ss-tarjeta">
+          <table class="ss-tabla tabla-ranking">
+            <thead>
+              <tr>
+                <th class="num">Puesto</th>
+                <th>Estudiante</th>
+                <th class="num col-evidencias">Evidencias</th>
+                <th class="num">Puntos</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (fila of resto(); track fila.estudianteId) {
+                <tr [class.mia]="esMia(fila)">
+                  <td class="num"><span class="posicion">{{ fila.posicion }}</span></td>
+                  <td>
+                    <strong>{{ fila.nombre }}</strong>
+                    @if (esMia(fila)) {
+                      <span class="tu">Tú</span>
+                    }
+                    @if (fila.escuela) {
+                      <small class="escuela-fila">{{ fila.escuela }}</small>
+                    }
+                  </td>
+                  <td class="num col-evidencias">{{ fila.evidencias }}</td>
+                  <td class="num"><strong>{{ fila.puntos | number: '1.0-2' }}</strong></td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+
+      @if (d.participantes > d.filas.length) {
+        <p class="pie-nota">Se muestran los primeros {{ d.filas.length }} de {{ d.participantes }} participantes.</p>
+      }
+    }
+  }
+</section>

@@ -18,8 +18,8 @@ export class CuentaService {
     return this.http.post<Cuenta>(this.api.buildUrl(this.resource), cuenta);
   }
 
-  cambiarRol(id: string, rol: RolCuenta): Observable<Cuenta> {
-    return this.http.patch<Cuenta>(this.api.buildUrl(`${this.resource}/${id}/rol`), { rol });
+  cambiarRol(id: string, rol: RolCuenta, sede: string | null): Observable<Cuenta> {
+    return this.http.patch<Cuenta>(this.api.buildUrl(`${this.resource}/${id}/rol`), { rol, sede });
   }
 
   cambiarEstado(id: string, activa: boolean): Observable<Cuenta> {

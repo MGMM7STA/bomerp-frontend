@@ -3,13 +3,48 @@
     <div>
       <span class="ss-eyebrow">Configuración</span>
       <h1 class="ss-titulo">Cuentas</h1>
-      <p class="ss-descripcion">Solo el administrador crea cuentas. Cada una entra con una contraseña temporal que se cambia al primer ingreso.</p>
+      <p class="ss-descripcion">Solo el administrador crea cuentas: revisa las solicitudes que llegan desde el formulario de Odoo o crea una a mano. Cada cuenta pertenece a una sede.</p>
     </div>
-    <button type="button" class="ss-btn ss-btn-primario" (click)="abrirCrear()">
-      <span class="material-symbols-outlined">person_add</span>
-      Nueva cuenta
-    </button>
+    <div class="ss-acciones">
+      <button type="button" class="ss-btn ss-btn-secundario" (click)="exportar('contactos')" [disabled]="exportando() !== null">
+        <span class="material-symbols-outlined">{{ exportando() === 'contactos' ? 'hourglass_top' : 'group' }}</span>
+        Estudiantes para Odoo
+      </button>
+      <button type="button" class="ss-btn ss-btn-secundario" (click)="exportar('puntos')" [disabled]="exportando() !== null">
+        <span class="material-symbols-outlined">{{ exportando() === 'puntos' ? 'hourglass_top' : 'loyalty' }}</span>
+        Puntos para Odoo
+      </button>
+      <button type="button" class="ss-btn ss-btn-primario" (click)="abrirCrear()">
+        <span class="material-symbols-outlined">person_add</span>
+        Nueva cuenta
+      </button>
+    </div>
   </header>
+
+  <nav class="pestanias" role="tablist">
+    <button type="button" role="tab" [class.activa]="pestania() === 'cuentas'" (click)="cambiarPestania('cuentas')">
+      <span class="material-symbols-outlined">manage_accounts</span>
+      Cuentas
+    </button>
+    <button type="button" role="tab" [class.activa]="pestania() === 'solicitudes'" (click)="cambiarPestania('solicitudes')">
+      <span class="material-symbols-outlined">how_to_reg</span>
+      Solicitudes
+      @if (pendientesSede() > 0) {
+        <span class="contador">{{ pendientesSede() }}</span>
+      }
+    </button>
+  </nav>
+
+  <div class="ss-chips filtro-sede" aria-label="Filtrar por sede">
+    <span class="filtro-etiqueta">
+      <span class="material-symbols-outlined">location_on</span>
+      <span class="filtro-etiqueta-texto">Sede</span>
+    </span>
+    <button type="button" class="ss-chip" [class.activo]="filtroSede() === 'TODAS'" (click)="filtroSede.set('TODAS')">Todas</button>
+    @for (s of sedes; track s.valor) {
+      <button type="button" class="ss-chip" [class.activo]="filtroSede() === s.valor" (click)="filtroSede.set(s.valor)">{{ s.nombre }}</button>
+    }
+  </div>
 
   @if (error()) {
     <div class="ss-aviso ss-aviso-error">
@@ -24,6 +59,7 @@
     </div>
   }
 
+  @if (pestania() === 'cuentas') {
   <div class="ss-stats">
     <div class="ss-stat">
       <span class="ss-stat-valor">{{ conteo().total }}</span>
@@ -65,6 +101,7 @@
           <th>Persona</th>
           <th>Usuario</th>
           <th>Rol</th>
+          <th>Sede</th>
           <th>Estado</th>
           <th>Acciones</th>
         </tr>
@@ -97,6 +134,15 @@
                 <span class="ss-badge ss-badge-gris">Sin rol</span>
               }
             </td>
+            <td data-etiqueta="Sede">
+              @if (cuenta.rol === 'ADMIN') {
+                <span class="ss-badge ss-badge-info">Todas</span>
+              } @else if (cuenta.sede) {
+                <span class="sede-texto">{{ nombreSede(cuenta.sede) }}</span>
+              } @else {
+                <span class="ss-badge ss-badge-pendiente">Sin sede</span>
+              }
+            </td>
             <td data-etiqueta="Estado">
               @if (cuenta.activa) {
                 <span class="ss-badge ss-badge-ok">Activa</span>
@@ -105,14 +151,14 @@
               }
             </td>
             <td data-etiqueta="Acciones">
-              <div class="ss-acciones">
+              <div class="ss-acciones en-linea">
                 <button type="button" class="ss-btn ss-btn-secundario ss-btn-chico" (click)="abrirRol(cuenta)">
                   <span class="material-symbols-outlined">badge</span>
-                  Rol
+                  Rol y sede
                 </button>
                 <button type="button" class="ss-btn ss-btn-secundario ss-btn-chico" (click)="abrirClave(cuenta)">
                   <span class="material-symbols-outlined">key</span>
-                  Contraseña
+                  Clave
                 </button>
                 @if (cuenta.activa) {
                   <button
@@ -135,7 +181,7 @@
           </tr>
         } @empty {
           <tr>
-            <td colspan="5" class="ss-vacio">
+            <td colspan="6" class="ss-vacio">
               {{ cargando() ? 'Cargando cuentas...' : 'No hay cuentas que coincidan con la búsqueda.' }}
             </td>
           </tr>
@@ -143,6 +189,69 @@
       </tbody>
     </table>
   </div>
+  } @else {
+    <div class="ss-chips filtro-solicitudes">
+      <button type="button" class="ss-chip" [class.activo]="filtroSolicitud() === 'PENDIENTE'" (click)="filtrarSolicitudes('PENDIENTE')">Pendientes</button>
+      <button type="button" class="ss-chip" [class.activo]="filtroSolicitud() === 'APROBADA'" (click)="filtrarSolicitudes('APROBADA')">Aprobadas</button>
+      <button type="button" class="ss-chip" [class.activo]="filtroSolicitud() === 'RECHAZADA'" (click)="filtrarSolicitudes('RECHAZADA')">Rechazadas</button>
+    </div>
+
+    <div class="solicitudes">
+      @for (s of solicitudesVisibles(); track s.id) {
+        <article class="ss-tarjeta solicitud">
+          <app-imagen-segura class="carne" [ruta]="'/api/v1/solicitudes-cuenta/' + s.id + '/carne'" texto="Carné universitario" />
+          <div class="solicitud-datos">
+            <header>
+              <div>
+                <strong>{{ s.nombres }} {{ s.apellidos }}</strong>
+                <small>{{ s.correo }}</small>
+              </div>
+              <div class="solicitud-meta">
+                @if (s.sede) {
+                  <span class="ss-badge ss-badge-info">{{ nombreSede(s.sede) }}</span>
+                } @else {
+                  <span class="ss-badge ss-badge-pendiente">Sin sede</span>
+                }
+                <span class="fecha">{{ s.fechaSolicitud | date: "d 'de' MMM, HH:mm" }}</span>
+              </div>
+            </header>
+            <dl>
+              <div><dt>Código</dt><dd>{{ s.codigoUniversitario || '—' }}</dd></div>
+              <div><dt>DNI</dt><dd>{{ s.dni || '—' }}</dd></div>
+              <div><dt>Escuela</dt><dd>{{ s.escuela || '—' }}{{ s.ciclo ? ' · ' + s.ciclo + '.º ciclo' : '' }}</dd></div>
+              <div><dt>Celular</dt><dd>{{ s.celular || '—' }}</dd></div>
+            </dl>
+            @if (s.estado === 'PENDIENTE') {
+              <footer class="ss-acciones">
+                <button type="button" class="ss-btn ss-btn-peligro ss-btn-chico" (click)="abrirRechazar(s)">
+                  <span class="material-symbols-outlined">close</span>
+                  Rechazar
+                </button>
+                <button type="button" class="ss-btn ss-btn-exito ss-btn-chico" (click)="abrirAprobar(s)">
+                  <span class="material-symbols-outlined">check</span>
+                  Aprobar y crear cuenta
+                </button>
+              </footer>
+            } @else if (s.estado === 'APROBADA') {
+              <p class="resultado ok">
+                <span class="material-symbols-outlined">check_circle</span>
+                Cuenta <code>{{ s.usuarioCreado }}</code> creada por {{ s.revisadoPor }}
+              </p>
+            } @else {
+              <p class="resultado no">
+                <span class="material-symbols-outlined">cancel</span>
+                Rechazada: {{ s.motivoRechazo }}
+              </p>
+            }
+          </div>
+        </article>
+      } @empty {
+        <div class="ss-tarjeta ss-vacio">
+          {{ cargandoSolicitudes() ? 'Cargando solicitudes desde Odoo...' : 'No hay solicitudes en este estado' + (filtroSede() === 'TODAS' ? '.' : ' para ' + nombreSede(filtroSede()) + '.') }}
+        </div>
+      }
+    </div>
+  }
 </section>
 
 @if (panel(); as p) {
@@ -223,6 +332,19 @@
               }
             </div>
           </div>
+          @if (rolElegido() !== 'ADMIN') {
+            <div class="ss-campo">
+              <label>Sede</label>
+              <div class="sedes">
+                @for (s of sedes; track s.valor) {
+                  <button type="button" class="opcion-sede" [class.activo]="sedeElegida() === s.valor" (click)="sedeElegida.set(s.valor)">
+                    <span class="material-symbols-outlined">location_on</span>
+                    {{ s.nombre }}
+                  </button>
+                }
+              </div>
+            </div>
+          }
           <footer class="modal-pie">
             <button type="button" class="ss-btn ss-btn-secundario" (click)="cerrar()">Cancelar</button>
             <button type="submit" class="ss-btn ss-btn-primario" [disabled]="guardando()">
@@ -234,7 +356,7 @@
       }
       @case ('rol') {
         <header class="modal-cabecera">
-          <h2>Rol de {{ p.cuenta.nombres }}</h2>
+          <h2>Rol y sede de {{ p.cuenta.nombres }}</h2>
           <button type="button" class="cerrar" (click)="cerrar()" aria-label="Cerrar">
             <span class="material-symbols-outlined">close</span>
           </button>
@@ -260,6 +382,21 @@
               </button>
             }
           </div>
+          @if (rolElegido() !== 'ADMIN') {
+            <div class="ss-campo">
+              <label>Sede</label>
+              <div class="sedes">
+                @for (s of sedes; track s.valor) {
+                  <button type="button" class="opcion-sede" [class.activo]="sedeElegida() === s.valor" (click)="sedeElegida.set(s.valor)">
+                    <span class="material-symbols-outlined">location_on</span>
+                    {{ s.nombre }}
+                  </button>
+                }
+              </div>
+            </div>
+          } @else {
+            <p class="nota">El administrador no tiene sede: ve y configura las tres.</p>
+          }
           @if (p.cuenta.id === miId()) {
             <p class="nota">No puedes quitarte el rol de administrador a ti mismo.</p>
           } @else {
@@ -269,7 +406,7 @@
             <button type="button" class="ss-btn ss-btn-secundario" (click)="cerrar()">Cancelar</button>
             <button type="button" class="ss-btn ss-btn-primario" (click)="guardarRol(p.cuenta)" [disabled]="guardando()">
               <span class="material-symbols-outlined">save</span>
-              Guardar rol
+              Guardar
             </button>
           </footer>
         </div>
@@ -309,10 +446,95 @@
           </footer>
         </div>
       }
+      @case ('aprobar') {
+        <header class="modal-cabecera">
+          <h2>Crear cuenta de {{ p.solicitud.nombres }}</h2>
+          <button type="button" class="cerrar" (click)="cerrar()" aria-label="Cerrar">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </header>
+        <div class="modal-cuerpo">
+          <p class="nota">
+            Se crea como <strong>estudiante</strong> de <strong>{{ nombreSede(p.solicitud.sede) }}</strong> con los datos que llenó en el formulario de Odoo.
+          </p>
+          @if (errorPanel()) {
+            <div class="ss-aviso ss-aviso-error">
+              <span class="material-symbols-outlined">error</span>
+              <span>{{ errorPanel() }}</span>
+            </div>
+          }
+          <div class="ss-campo">
+            <label for="usuario-aprobar">Usuario</label>
+            <input id="usuario-aprobar" class="ss-input" [value]="usuarioAprobar()" (input)="escribirUsuario($event)" autocomplete="off" />
+            <small>Sugerido desde su correo. Con esto inicia sesión.</small>
+          </div>
+          <label class="opcion-correo">
+            <input type="checkbox" [checked]="enviarCorreo()" (change)="alternarCorreo($event)" />
+            <span>
+              <strong>Enviarle sus datos de acceso por correo desde Odoo</strong>
+              <small>Le llega a {{ p.solicitud.correo }} con su usuario y una contraseña temporal. Si Odoo no puede enviarlo, te la muestro aquí.</small>
+            </span>
+          </label>
+          <footer class="modal-pie">
+            <button type="button" class="ss-btn ss-btn-secundario" (click)="cerrar()">Cancelar</button>
+            <button type="button" class="ss-btn ss-btn-exito" (click)="aprobar(p.solicitud)" [disabled]="guardando()">
+              <span class="material-symbols-outlined">how_to_reg</span>
+              {{ guardando() ? 'Creando...' : 'Aprobar' }}
+            </button>
+          </footer>
+        </div>
+      }
+      @case ('rechazar') {
+        <header class="modal-cabecera">
+          <h2>Rechazar solicitud</h2>
+          <button type="button" class="cerrar" (click)="cerrar()" aria-label="Cerrar">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </header>
+        <div class="modal-cuerpo">
+          <p class="nota">{{ p.solicitud.nombres }} {{ p.solicitud.apellidos }} no tendrá cuenta. Deja claro el motivo por si vuelve a solicitarla.</p>
+          @if (errorPanel()) {
+            <div class="ss-aviso ss-aviso-error">
+              <span class="material-symbols-outlined">error</span>
+              <span>{{ errorPanel() }}</span>
+            </div>
+          }
+          <div class="ss-campo">
+            <label for="motivo">Motivo</label>
+            <textarea id="motivo" class="ss-input" rows="3" maxlength="300" placeholder="Ej. El carné no coincide con el nombre" [value]="motivo()" (input)="escribirMotivo($event)"></textarea>
+          </div>
+          <footer class="modal-pie">
+            <button type="button" class="ss-btn ss-btn-secundario" (click)="cerrar()">Cancelar</button>
+            <button type="button" class="ss-btn ss-btn-peligro-lleno" (click)="rechazar(p.solicitud)" [disabled]="guardando()">
+              <span class="material-symbols-outlined">block</span>
+              Rechazar
+            </button>
+          </footer>
+        </div>
+      }
+      @case ('correo') {
+        <div class="modal-cuerpo entrega">
+          <span class="icono-ok"><span class="material-symbols-outlined">forward_to_inbox</span></span>
+          <h2>Cuenta creada</h2>
+          <p class="nota">
+            Odoo le envió a <strong>{{ p.correo }}</strong> su usuario <code>{{ p.usuario }}</code> y una contraseña temporal.
+            Al ingresar por primera vez, {{ p.nombre }} tendrá que cambiarla.
+          </p>
+          <footer class="modal-pie">
+            <button type="button" class="ss-btn ss-btn-primario" (click)="cerrar()">Listo</button>
+          </footer>
+        </div>
+      }
       @case ('entregar') {
         <div class="modal-cuerpo entrega">
           <span class="icono-ok"><span class="material-symbols-outlined">how_to_reg</span></span>
           <h2>{{ p.nueva ? 'Cuenta creada' : 'Contraseña restablecida' }}</h2>
+          @if (p.sinCorreo) {
+            <div class="ss-aviso ss-aviso-info">
+              <span class="material-symbols-outlined">info</span>
+              <span>Odoo no pudo enviar el correo (revisa el servidor de correo saliente en Odoo). Pásale estos datos a mano.</span>
+            </div>
+          }
           <p class="nota">Pásale estos datos a {{ p.nombre }}. La contraseña no se vuelve a mostrar.</p>
           <dl class="credenciales">
             <div>

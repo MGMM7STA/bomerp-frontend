@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ApiService } from '../../../core/services/api-service';
-import { Estudiante } from './estudiante.model';
+import { Estudiante, Ranking } from './estudiante.model';
 
 @Injectable({ providedIn: 'root' })
 export class EstudianteService {
@@ -16,5 +16,11 @@ export class EstudianteService {
 
   listar(): Observable<Estudiante[]> {
     return this.http.get<Estudiante[]>(this.api.buildUrl(this.resource));
+  }
+
+  ranking(limite = 50, campaniaId?: number): Observable<Ranking> {
+    const params: Record<string, number> = { limite };
+    if (campaniaId) params['campaniaId'] = campaniaId;
+    return this.http.get<Ranking>(this.api.buildUrl(`${this.resource}/ranking`), { params });
   }
 }

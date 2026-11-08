@@ -7,6 +7,7 @@ import { Habito } from '../habito/habito.model';
 import { CampaniaService } from './campania-service';
 import { CampaniaRequest, EstadoCampania } from './campania.model';
 import { mensajeDeError } from '../../../shared/utilidades/errores';
+import { SEDES, SedeService } from '../../../core/sede/sede-service';
 
 interface Grupo {
   id: number;
@@ -28,6 +29,9 @@ export class CampaniaForm implements OnInit {
   private readonly router = inject(Router);
   private readonly campaniaService = inject(CampaniaService);
   private readonly habitoService = inject(HabitoService);
+  private readonly sedeService = inject(SedeService);
+
+  protected readonly sedes = SEDES;
 
   protected readonly estados: { valor: EstadoCampania; texto: string; ayuda: string }[] = [
     { valor: 'BORRADOR', texto: 'Borrador', ayuda: 'Se prepara sin que los estudiantes la vean' },
@@ -38,6 +42,7 @@ export class CampaniaForm implements OnInit {
   protected readonly id = signal<number | null>(null);
   protected readonly habitos = signal<Habito[]>([]);
   protected readonly elegidos = signal<Set<number>>(new Set());
+  protected readonly sedesElegidas = signal<Set<string>>(new Set([this.sedeService.actual() ?? 'JULIACA']));
   protected readonly error = signal<string | null>(null);
   protected readonly guardando = signal(false);
   protected readonly intentado = signal(false);
@@ -91,6 +96,7 @@ export class CampaniaForm implements OnInit {
             estado: c.estado,
           });
           this.elegidos.set(new Set(c.habitoIds));
+          this.sedesElegidas.set(new Set(c.sedes ?? []));
         },
         error: (err) => this.error.set(mensajeDeError(err, 'No se encontró la campaña.')),
       });
@@ -106,6 +112,15 @@ export class CampaniaForm implements OnInit {
       const nuevo = new Set(actual);
       if (nuevo.has(habito.id)) nuevo.delete(habito.id);
       else nuevo.add(habito.id);
+      return nuevo;
+    });
+  }
+
+  protected alternarSede(sede: string): void {
+    this.sedesElegidas.update((actual) => {
+      const nuevo = new Set(actual);
+      if (nuevo.has(sede)) nuevo.delete(sede);
+      else nuevo.add(sede);
       return nuevo;
     });
   }
@@ -133,13 +148,17 @@ export class CampaniaForm implements OnInit {
 
   protected guardar(): void {
     this.intentado.set(true);
-    if (this.form.invalid || this.fechasInvalidas() || this.elegidos().size === 0) {
+    if (this.form.invalid || this.fechasInvalidas() || this.elegidos().size === 0 || this.sedesElegidas().size === 0) {
       this.form.markAllAsTouched();
       return;
     }
     this.error.set(null);
     this.guardando.set(true);
-    const datos: CampaniaRequest = { ...this.form.getRawValue(), habitoIds: [...this.elegidos()] };
+    const datos: CampaniaRequest = {
+      ...this.form.getRawValue(),
+      habitoIds: [...this.elegidos()],
+      sedes: SEDES.map((s) => s.valor).filter((s) => this.sedesElegidas().has(s)),
+    };
     const id = this.id();
     const peticion = id ? this.campaniaService.actualizar(id, datos) : this.campaniaService.crear(datos);
     peticion.subscribe({

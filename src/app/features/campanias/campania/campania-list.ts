@@ -6,6 +6,7 @@ import { Campania, EstadoCampania } from './campania.model';
 import { ConfirmacionService } from '../../../shared/confirmacion/confirmacion';
 import { mensajeDeError } from '../../../shared/utilidades/errores';
 import { aFechaLocal } from '../../../core/inicio/fechas';
+import { SedeService, nombreSede } from '../../../core/sede/sede-service';
 
 const ESTADOS: Record<EstadoCampania, { texto: string; clase: string }> = {
   ACTIVA: { texto: 'Activa', clase: 'ss-badge-ok' },
@@ -21,6 +22,8 @@ const ESTADOS: Record<EstadoCampania, { texto: string; clase: string }> = {
 export class CampaniaList implements OnInit {
   private readonly campaniaService = inject(CampaniaService);
   private readonly confirmacion = inject(ConfirmacionService);
+  protected readonly sede = inject(SedeService);
+  protected readonly nombreSede = nombreSede;
 
   protected readonly campanias = signal<Campania[]>([]);
   protected readonly cargando = signal(true);

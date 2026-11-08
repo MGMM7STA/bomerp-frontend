@@ -7,6 +7,7 @@ import { RegistroService } from '../../features/participacion/registro/registro-
 import { RegistroResponse } from '../../features/participacion/registro/registro.model';
 import { HabitoService } from '../../features/campanias/habito/habito-service';
 import { claveDia, diasRestantes, etiquetaDia, fechaCorta } from './fechas';
+import { SedeService } from '../sede/sede-service';
 
 interface Barra {
   etiqueta: string;
@@ -24,11 +25,13 @@ export class PanelCoordinacion implements OnInit {
   private readonly campaniaService = inject(CampaniaService);
   private readonly registroService = inject(RegistroService);
   private readonly habitoService = inject(HabitoService);
+  protected readonly sede = inject(SedeService);
 
   protected readonly campania = signal<Campania | null>(null);
   protected readonly registros = signal<RegistroResponse[]>([]);
   private readonly nombresHabito = signal<Map<number, string>>(new Map());
   protected readonly cargando = signal(true);
+  protected readonly sinCampania = signal(false);
   protected readonly error = signal<string | null>(null);
 
   private readonly vigentes = computed(() =>
@@ -96,7 +99,10 @@ export class PanelCoordinacion implements OnInit {
   ngOnInit(): void {
     this.campaniaService.obtenerActiva().subscribe({
       next: (data) => this.campania.set(data),
-      error: () => this.campania.set(null),
+      error: () => {
+        this.campania.set(null);
+        this.sinCampania.set(true);
+      },
     });
     this.habitoService.listar().subscribe({
       next: (data) => this.nombresHabito.set(new Map(data.map((h) => [h.id, h.nombre]))),

@@ -200,6 +200,14 @@ form mat-form-field {
   flex-wrap: wrap;
 }
 
+.ss-acciones.en-linea {
+  flex-wrap: nowrap;
+}
+
+.ss-acciones.en-linea .ss-btn {
+  white-space: nowrap;
+}
+
 .ss-tabla {
   width: 100%;
   border-collapse: collapse;

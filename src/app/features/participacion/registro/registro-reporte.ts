@@ -6,6 +6,7 @@ import { RegistroService } from './registro-service';
 import { RegistroResponse } from './registro.model';
 import { AuthService } from '../../../core/auth/auth-service';
 import { EstudianteService } from '../estudiante/estudiante-service';
+import { SedeService } from '../../../core/sede/sede-service';
 import { Estudiante } from '../estudiante/estudiante.model';
 import { ConfirmacionService } from '../../../shared/confirmacion/confirmacion';
 import { estiloEstado } from '../../../shared/utilidades/estados';
@@ -20,6 +21,7 @@ export class RegistroReporteComponent implements OnInit {
   private readonly registroService = inject(RegistroService);
   protected readonly auth = inject(AuthService);
   private readonly estudianteService = inject(EstudianteService);
+  protected readonly sede = inject(SedeService);
   private readonly confirmacion = inject(ConfirmacionService);
   protected readonly estilo = estiloEstado;
   protected readonly estudiantes = signal<Map<number, Estudiante>>(new Map());

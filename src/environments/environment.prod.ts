@@ -1,4 +1,5 @@
 export const environment = {
+  formularioInscripcionUrl: '',
   apiBaseUrl: 'http://localhost:48088',
   keycloak: {
     issuer: 'http://localhost:48080/realms/saludable',
