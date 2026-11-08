@@ -23,6 +23,18 @@ const ACCIONES: Record<string, { texto: string; clase: string; icono: string }> 
   CREAR_CAMPANIA: { texto: 'Creó campaña', clase: 'ss-badge-info', icono: 'campaign' },
   EDITAR_CAMPANIA: { texto: 'Editó campaña', clase: 'ss-badge-pendiente', icono: 'edit' },
   ELIMINAR_CAMPANIA: { texto: 'Eliminó campaña', clase: 'ss-badge-rechazado', icono: 'delete' },
+  CREAR_HABITO: { texto: 'Creó hábito', clase: 'ss-badge-info', icono: 'self_improvement' },
+  EDITAR_HABITO: { texto: 'Editó hábito', clase: 'ss-badge-pendiente', icono: 'edit' },
+  ELIMINAR_HABITO: { texto: 'Eliminó hábito', clase: 'ss-badge-rechazado', icono: 'delete' },
+  CREAR_CATEGORIA_HABITO: { texto: 'Creó categoría de hábito', clase: 'ss-badge-info', icono: 'sell' },
+  EDITAR_CATEGORIA_HABITO: { texto: 'Editó categoría de hábito', clase: 'ss-badge-pendiente', icono: 'edit' },
+  ELIMINAR_CATEGORIA_HABITO: { texto: 'Eliminó categoría de hábito', clase: 'ss-badge-rechazado', icono: 'delete' },
+  CREAR_PREMIO: { texto: 'Creó premio', clase: 'ss-badge-info', icono: 'redeem' },
+  EDITAR_PREMIO: { texto: 'Editó premio', clase: 'ss-badge-pendiente', icono: 'edit' },
+  ELIMINAR_PREMIO: { texto: 'Eliminó premio', clase: 'ss-badge-rechazado', icono: 'delete' },
+  CREAR_CATEGORIA_PREMIO: { texto: 'Creó categoría de premio', clase: 'ss-badge-info', icono: 'category' },
+  EDITAR_CATEGORIA_PREMIO: { texto: 'Editó categoría de premio', clase: 'ss-badge-pendiente', icono: 'edit' },
+  ELIMINAR_CATEGORIA_PREMIO: { texto: 'Eliminó categoría de premio', clase: 'ss-badge-rechazado', icono: 'delete' },
 };
 
 @Component({

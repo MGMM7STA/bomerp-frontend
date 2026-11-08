@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -9,7 +9,7 @@ import { MensajeError } from '../../../shared/mensaje-error/mensaje-error';
   imports: [ReactiveFormsModule, MensajeError],
   templateUrl: './categoria-habito-form.html',
 })
-export class CategoriaHabitoForm implements OnInit {
+export class CategoriaHabitoForm {
   private readonly fb = inject(FormBuilder);
   private readonly categoriaHabitoService = inject(CategoriaHabitoService);
   private readonly route = inject(ActivatedRoute);
@@ -43,14 +43,6 @@ export class CategoriaHabitoForm implements OnInit {
         },
       });
     }
-  }
-
-  ngOnInit(): void {
-    this.form.valueChanges.subscribe((valor) => {
-      console.log('Formulario:', valor);
-      console.log('Nombre:', valor.nombre);
-      console.log('Descripcion:', valor.descripcion);
-    });
   }
 
   guardar(): void {

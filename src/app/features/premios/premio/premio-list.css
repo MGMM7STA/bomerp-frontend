@@ -148,6 +148,7 @@ button:disabled {
 .form-field textarea,
 .form-field .ss-select,
 .filter-row .ss-select {
+  box-sizing: border-box;
   width: 100%;
   padding: 12px 13px;
   border: 1px solid var(--ss-line);
